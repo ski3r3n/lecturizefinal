@@ -58,7 +58,7 @@ export default function Home() {
                                 Effective
                             </Heading>
                             <Text pt="2" fontSize="sm">
-                                Lecturize takes notes well and doesn't miss a
+                                Lecturize takes notes well and does not miss a
                                 thing.
                             </Text>
                         </Box>
