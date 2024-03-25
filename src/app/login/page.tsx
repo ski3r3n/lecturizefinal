@@ -32,7 +32,7 @@ export default function Login() {
     return (
         <>
             <Box display="flex" h="100vh" w="100vw" bg="#f3f5f8">
-                <Card variant="filled" margin="auto" bgColor="white" w="20%">
+                <Card variant="filled" margin="auto" bgColor="white" w="30%">
                     <CardHeader display="flex">
                         <Image
                             height="50"

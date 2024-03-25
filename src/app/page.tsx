@@ -28,7 +28,7 @@ import {
 import Navbar from "@/components/navbar";
 export default function Home() {
     return (
-        <>
+        <><Box bgColor="#f3f5f8">
             <Navbar loggedin={0}></Navbar>
             <br></br>
             <br></br>
@@ -46,7 +46,7 @@ export default function Home() {
             <br></br>
             <br></br>
             <br></br>
-            <Card variant="filled" margin="auto" bgColor="lightblue" w="50%">
+            <Card variant="filled" margin="auto" bgColor="white" w="50%">
                 <CardHeader>
                     <Heading size="xl">Lecturise is:</Heading>
                 </CardHeader>
@@ -79,12 +79,12 @@ export default function Home() {
                                 Every detail gets captured in your notes.
                             </Text>
                         </Box>
-                        <Link href="/login" margin="auto" w="fit-content"><Button colorScheme="blue" >Log In</Button></Link>
+                        <Link href="/login" margin="auto" w="fit-content"><Button bgColor="#2b63d9" color="#ffffff" >Log In</Button></Link>
                     </Stack>
                     
                 </CardBody>
             </Card>
-            
+            </Box>
         </>
     );
 }
