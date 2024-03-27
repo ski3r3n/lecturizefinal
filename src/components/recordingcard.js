@@ -35,9 +35,7 @@ export default function Recordingcard(props) {
                     mb={6}
                     pos={"relative"}>
                     <Image
-                        src={
-                            "https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.freepik.com%2Fphotos%2Fstudy-notes&psig=AOvVaw1jCvDxqB1OLwD-h9bguxfz&ust=1711617467294000&source=images&cd=vfe&opi=89978449&ved=0CBIQjRxqFwoTCNi70ouOlIUDFQAAAAAdAAAAABAn"
-                        }
+                        src={"/public-examination-preparation-concept.jpg"}
                         fill
                         alt="Example"
                     />

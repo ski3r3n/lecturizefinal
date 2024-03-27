@@ -45,6 +45,7 @@ interface LinkItemProps {
 interface NavItemProps extends FlexProps {
     icon: IconType;
     children: React.ReactNode;
+    link: string;
 }
 
 interface MobileProps extends FlexProps {
@@ -214,7 +215,7 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
     );
 };
 
-const SidebarWithHeader = ({ children }) => {
+const SidebarWithHeader = ({ children } : any) => {
     const { isOpen, onOpen, onClose } = useDisclosure();
 
     return (
