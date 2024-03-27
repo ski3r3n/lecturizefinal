@@ -32,7 +32,7 @@ export default function Login() {
     return (
         <>
             <Box display="flex" h="100vh" w="100vw" bg="#f3f5f8">
-                <Card variant="filled" margin="auto" bgColor="white" w="30%">
+                <Card variant="filled" margin="auto" bgColor="white" w="30%" boxShadow={'lg'}>
                     <CardHeader display="flex">
                         <Image
                             height="50"
@@ -43,24 +43,24 @@ export default function Login() {
                     </CardHeader>
 
                     <CardBody>
-                        <Stack divider={<StackDivider />} spacing="4">
+                        <Stack spacing="4">
                             <Box>
                                 Username <br></br>
                                 <Input
                                     mt="10px"
                                     size="sm"
-                                    placeholder="Enter Username..."
+                                    borderRadius="5px"
                                     type="text"
-                                    background="#f3f5f8"></Input>
+                                    background="#fff"></Input>
                             </Box>
                             <Box>
                                 Password <br></br>
                                 <Input
                                     mt="10px"
                                     size="sm"
-                                    placeholder="Enter Password..."
+                                    borderRadius="5px"
                                     type="password"
-                                    background="#f3f5f8"></Input>
+                                    background="#fff"></Input>
                             </Box>
                             <Box display="flex">
                                 <Checkbox>Remember me</Checkbox>

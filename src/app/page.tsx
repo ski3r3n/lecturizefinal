@@ -28,7 +28,7 @@ import {
 import Navbar from "@/components/navbar";
 export default function Home() {
     return (
-        <><Box bgColor="#f3f5f8">
+        <><Box bgColor="#f3f5f8" w="100vw" h="100vh">
             <Navbar loggedin={0}></Navbar>
             <br></br>
             <br></br>

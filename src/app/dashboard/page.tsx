@@ -27,35 +27,48 @@ import {
     OrderedList,
     UnorderedList,
 } from "@chakra-ui/react";
+import SidebarWithHeader from "@/components/sidebar";
 import Navbar from "@/components/navbar";
+import Recordingcard from "@/components/recordingcard";
 export default function Dashboard() {
     return (
         <>
-            <Box display="flex" height="100vh" width="100vw" bgColor="#f3f5f8">
-                <Navbar loggedin="1"></Navbar>
-                <br></br>
-                <br></br>
-                <br></br>
-                <Button
-                    bgColor="red"
-                    _hover={{
-                        background: "#E99995",
-                    }}
-                    _active={{
-                        background: "#F6D4D2",
-                    }}
-                    color="#ffffff"
-                    margin="auto"
-                    height="150px"
-                    width="150px"
-                    borderRadius="190px">
-                    <Image
-                        src="/voice-recording-svgrepo-com.svg"
-                        alt="Record"
-                        width="100"
-                        height="100"></Image>
-                </Button>
+            <Box zIndex="1"
+                display="flex"
+                flexDir="column"
+                position="fixed"
+                height="100vh"
+                width="100vw"
+                bgColor="#f3f5f8">
+                <SidebarWithHeader>
+                    <Box display="flex" flexWrap="wrap" ml="250px">
+                        <Recordingcard
+                            title="Lorem Ipsum"
+                            preview="Dolor sit amet, consectetur adipiscing elit. Phasellus quis libero mauris. Integer at nisl sed lectus congue posuere. Etiam et sodales risus. Aliquam scelerisque tempor suscipit. Pellentesque feugiat quam ac pretium tincidunt. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Curabitur tempor, massa eget sollicitudin placerat, massa sapien ornare diam, sed cursus lorem purus sed tellus."
+                            creator="Richard McClintock"></Recordingcard>
+                        <Recordingcard
+                            title="Lorem Ipsum"
+                            preview="Dolor sit amet, consectetur adipiscing elit. Phasellus quis libero mauris. Integer at nisl sed lectus congue posuere. Etiam et sodales risus. Aliquam scelerisque tempor suscipit. Pellentesque feugiat quam ac pretium tincidunt. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Curabitur tempor, massa eget sollicitudin placerat, massa sapien ornare diam, sed cursus lorem purus sed tellus."
+                            creator="Richard McClintock"></Recordingcard>
+                        <Recordingcard
+                            title="Lorem Ipsum"
+                            preview="Dolor sit amet, consectetur adipiscing elit. Phasellus quis libero mauris. Integer at nisl sed lectus congue posuere. Etiam et sodales risus. Aliquam scelerisque tempor suscipit. Pellentesque feugiat quam ac pretium tincidunt. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Curabitur tempor, massa eget sollicitudin placerat, massa sapien ornare diam, sed cursus lorem purus sed tellus."
+                            creator="Richard McClintock"></Recordingcard>
+                        <Recordingcard
+                            title="Lorem Ipsum"
+                            preview="Dolor sit amet, consectetur adipiscing elit. Phasellus quis libero mauris. Integer at nisl sed lectus congue posuere. Etiam et sodales risus. Aliquam scelerisque tempor suscipit. Pellentesque feugiat quam ac pretium tincidunt. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Curabitur tempor, massa eget sollicitudin placerat, massa sapien ornare diam, sed cursus lorem purus sed tellus."
+                            creator="Richard McClintock"></Recordingcard>
+                        <Recordingcard
+                            title="Lorem Ipsum"
+                            preview="Dolor sit amet, consectetur adipiscing elit. Phasellus quis libero mauris. Integer at nisl sed lectus congue posuere. Etiam et sodales risus. Aliquam scelerisque tempor suscipit. Pellentesque feugiat quam ac pretium tincidunt. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Curabitur tempor, massa eget sollicitudin placerat, massa sapien ornare diam, sed cursus lorem purus sed tellus."
+                            creator="Richard McClintock"></Recordingcard>
+                    </Box>
+                </SidebarWithHeader>
             </Box>
+            <br></br>
+            <br></br>
+            <br></br>
+            
         </>
     );
 }
