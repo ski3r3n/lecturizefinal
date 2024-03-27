@@ -34,7 +34,13 @@ export default function Recordingcard(props) {
                     mx={-6}
                     mb={6}
                     pos={"relative"}>
-                    <Image src={"vercel.svg"} fill alt="Example" />
+                    <Image
+                        src={
+                            "https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.freepik.com%2Fphotos%2Fstudy-notes&psig=AOvVaw1jCvDxqB1OLwD-h9bguxfz&ust=1711617467294000&source=images&cd=vfe&opi=89978449&ved=0CBIQjRxqFwoTCNi70ouOlIUDFQAAAAAdAAAAABAn"
+                        }
+                        fill
+                        alt="Example"
+                    />
                 </Box>
                 <Stack>
                     <Heading
