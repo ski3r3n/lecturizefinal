@@ -51,12 +51,18 @@ export default function Dashboard() {
           <Button
             onClick={() => {
               if (recording == 0) {
-                document.getElementById("recordingButton").src =
-                  "/soundwaves.gif";
+                (
+                  document.getElementById(
+                    "recordingButton",
+                  )! as HTMLImageElement
+                ).src = "/soundwaves.gif";
                 recording = 1;
               } else {
-                document.getElementById("recordingButton").src =
-                  "/voice-recording-svgrepo-com.svg";
+                (
+                  document.getElementById(
+                    "recordingButton",
+                  )! as HTMLImageElement
+                ).src = "/voice-recording-svgrepo-com.svg";
                 recording = 0;
               }
             }}
