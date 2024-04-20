@@ -5,7 +5,7 @@ export default function Whyareyouhere() {
   return (
     <>
       <Link href="/dashboard">
-        <Button>Hey, you shouldn't be here! Click to go back now!</Button>
+        <Button>Hey, you should not be here! Click to go back now!</Button>
       </Link>
     </>
   );
