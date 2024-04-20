@@ -1,5 +1,5 @@
 "use client";
-
+import SidebarWithHeader from "@/components/sidebar";
 import {
   Box,
   chakra,
@@ -24,22 +24,14 @@ import { MdLocalShipping } from "react-icons/md";
 export default function Note() {
   return (
     <Container maxW={"7xl"}>
+      <SidebarWithHeader></SidebarWithHeader>
+
       <SimpleGrid
         columns={{ base: 1, lg: 2 }}
         spacing={{ base: 8, md: 10 }}
         py={{ base: 18, md: 24 }}
       >
-        <Flex>
-          <Image
-            rounded={"md"}
-            alt={"product image"}
-            src={"/vercel.svg"}
-            fit={"cover"}
-            align={"center"}
-            w={"100%"}
-            h={{ base: "100%", sm: "400px", lg: "500px" }}
-          />
-        </Flex>
+        <Flex margin-left="250px"></Flex>
         <Stack spacing={{ base: 6, md: 10 }}>
           <Box as={"header"}>
             <Heading
@@ -109,6 +101,9 @@ export default function Note() {
             </VStack>
             <Link width="100%" href="/dashboard">
               <Button width="100%">Go back</Button>
+            </Link>
+            <Link width="100%" href={document.URL + "/edit"}>
+              <Button width="100%">Edit</Button>
             </Link>
           </Stack>
           <Stack
