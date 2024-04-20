@@ -2,11 +2,10 @@
 import { Button, Link } from "@chakra-ui/react";
 
 export default function Whyareyouhere() {
-  window.location.href = "/dashboard";
   return (
     <>
       <Link href="/dashboard">
-        <Button>Click here if browser does not redirect you back</Button>
+        <Button>Hey, you shouldn't be here! Click to go back now!</Button>
       </Link>
     </>
   );
