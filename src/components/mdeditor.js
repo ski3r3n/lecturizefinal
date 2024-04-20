@@ -1,8 +1,8 @@
 "use client";
 import React, { useState } from "react";
+import { FiEyeOff, FiEye } from "react-icons/fi";
 import ReactMarkdown from "react-markdown";
 import SyntaxHighlighter from "react-syntax-highlighter";
-import VisibilityIcon from "@material-ui/icons/Visibility";
 import { docco } from "react-syntax-highlighter/dist/esm/styles/hljs";
 export default function Mdeditor() {
   const [markdownInput, setMarkdownInput] = useState();
@@ -13,9 +13,17 @@ export default function Mdeditor() {
       </div>
       <div className="wrapperer">
         <div className="wrapper">
-          <div className="head">
-            <VisibilityIcon />
-            &nbsp;MARKDOWN
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <FiEye></FiEye>
+
+            <div className="head">&nbsp;MARKDOWN</div>
           </div>
           <textarea
             id="whereitallis"
@@ -26,9 +34,17 @@ export default function Mdeditor() {
           ></textarea>
         </div>
         <div className="wrapper">
-          <div className="head">
-            <VisibilityIcon />
-            &nbsp;PREIVEW
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <FiEye></FiEye>
+
+            <div className="head">&nbsp;PREIVEW</div>
           </div>
           <ReactMarkdown
             children={markdownInput}
