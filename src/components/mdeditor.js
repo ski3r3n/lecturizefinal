@@ -47,11 +47,10 @@ export default function Mdeditor() {
             <div className="head">&nbsp;PREIVEW</div>
           </div>
           <ReactMarkdown
-            children={markdownInput}
             components={{
               code: MarkComponent,
             }}
-          />
+          >{markdownInput}</ReactMarkdown>
         </div>
       </div>
       <button
