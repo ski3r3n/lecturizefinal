@@ -1,6 +1,5 @@
 "use client";
 import React, { useState } from "react";
-import Quill from "quill";
 import ReactMarkdown from "react-markdown";
 import SyntaxHighlighter from "react-syntax-highlighter";
 import VisibilityIcon from "@material-ui/icons/Visibility";
