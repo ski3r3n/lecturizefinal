@@ -28,6 +28,7 @@ export default function Mdeditor() {
                 break;
             }
         }
+        console.log("Start of line:", startOfLine);
         return startOfLine;
     }
 
@@ -37,8 +38,8 @@ export default function Mdeditor() {
         const text = textarea.value;
 
         // End of line is assumed to be the position of the nearest newline character
-        let endOfLine = 0;
-        for (let i = caretPosition; i < text.length; i++) {
+        let endOfLine = text.length;
+        for (let i = caretPosition; i <= text.length; i++) {
             if (text[i] === "\n") {
                 endOfLine = i;
                 break;
@@ -59,7 +60,7 @@ export default function Mdeditor() {
             console.log("Selected text:", selectedText);
             return selectedText;
         } catch {
-            console.log("error");
+            return null;
         }
     }
 
@@ -231,21 +232,33 @@ export default function Mdeditor() {
                             onClick={toggleItalics}>
                             Italics
                         </button>
-                        <button
-                            style={{
-                                border: " 2px solid gray",
-                                padding: "10px",
-                                borderRadius: "10px",
-                            }}
-                            onClick={() => {
-                                addHeading();
-                            }}>
-                            Heading
+                        <button>
+                            <button
+                                style={{
+                                    border: " 2px solid gray",
+                                    padding: "10px",
+                                    borderRadius: "10px",
+                                }}
+                                onClick={() => {
+                                    addHeading();
+                                }}>
+                                Heading &nbsp;
+                            </button>
+                            &nbsp; 1 &nbsp;
+                            <input
+                                min={1}
+                                max={6}
+                                style={{
+                                    border: "2px solid gray",
+                                    width: "120px",
+                                    borderRadius: "10px",
+                                }}
+                                placeholder="Header size"
+                                type="range"
+                                id="headingamt"></input>
+                            &nbsp; 6 &nbsp;
                         </button>
-                        <input
-                            placeholder="amount"
-                            type={"number"}
-                            id="headingamt"></input>
+
                         <button
                             style={{
                                 border: "2px solid gray",
