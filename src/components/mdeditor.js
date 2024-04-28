@@ -215,34 +215,37 @@ export default function Mdeditor() {
                             style={{
                                 border: " 2px solid gray",
                                 padding: "10px",
+                                width: "50px",
                                 borderRadius: "10px",
                             }}
                             onClick={() => {
                                 boldSelected();
                             }}>
-                            Bold
+                            <b>B</b>
                         </button>
 
                         <button
                             style={{
                                 border: "2px solid gray",
                                 padding: "10px",
+                                width: "50px",
                                 borderRadius: "10px",
                             }}
                             onClick={toggleItalics}>
-                            Italics
+                            <i>I</i>
                         </button>
-                        <button>
+                        <span>
                             <button
                                 style={{
                                     border: " 2px solid gray",
                                     padding: "10px",
+                                    width: "50px",
                                     borderRadius: "10px",
                                 }}
                                 onClick={() => {
                                     addHeading();
                                 }}>
-                                Heading &nbsp;
+                                <b>H</b> &nbsp;
                             </button>
                             &nbsp; 1 &nbsp;
                             <input
@@ -257,34 +260,38 @@ export default function Mdeditor() {
                                 type="range"
                                 id="headingamt"></input>
                             &nbsp; 6 &nbsp;
-                        </button>
+                        </span>
 
                         <button
                             style={{
                                 border: "2px solid gray",
                                 padding: "10px",
+                                width: "50px",
                                 borderRadius: "10px",
                             }}
                             onClick={addBulletPoints}>
-                            Bullet Points
+                            <li></li>
                         </button>
                         <button
                             style={{
                                 border: "2px solid gray",
                                 padding: "10px",
                                 borderRadius: "10px",
+                                width: "50px",
                             }}
                             onClick={toggleUnderline}>
-                            Underline
+                            <u>U</u>
                         </button>
                         <button
                             style={{
                                 border: "2px solid gray",
+                                width: "50px",
+                                height: "50px",
                                 padding: "10px",
                                 borderRadius: "10px",
                             }}
                             onClick={insertImage}>
-                            Insert Image
+                            <img src="/"></img>
                         </button>
                     </div>
                     <textarea
