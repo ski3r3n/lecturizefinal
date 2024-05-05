@@ -4,7 +4,7 @@
 [![forthebadge](http://forthebadge.com/images/badges/built-with-love.svg)](http://forthebadge.com)
 
 [![Author](https://img.shields.io/badge/author-ski3r3n_&_InsanelyAvner-lightgrey.svg?style=flat&color=%23673ab7)](https://github.com/ski3r3n)
-[![GitHub LICENSE](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://github.com/ski3r3n/lecturizefinal/LISENCE)
+[![GitHub LICENSE](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/ski3r3n/lecturizefinal/LISENCE)
 [![Release](https://img.shields.io/github/v/release/ski3r3n/lecturizefinal?style=flat&color=%23009688)](https://github.com/ski3r3n/lecturizefinal/releases)
 
 A platform that converts verbal teaching into concise, summarised revision notes using AI.
@@ -49,4 +49,4 @@ Your contributions are always welcome! Feel free to fork this project and work o
 
 Copyright © 2024 by ski3r3n and InsanelyAvner.
 
-This project is licensed under the GNU General Public License v3.0 - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT license - see the [LICENSE](LICENSE) file for details.
