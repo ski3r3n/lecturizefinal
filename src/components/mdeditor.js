@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import { FiEyeOff, FiEye } from "react-icons/fi";
+import { FiPenTool, FiEye, FiImage, FiLink, FiLink2 } from "react-icons/fi";
 import ReactMarkdown from "react-markdown";
 import SyntaxHighlighter from "react-syntax-highlighter";
 import { docco } from "react-syntax-highlighter/dist/esm/styles/hljs";
@@ -191,6 +191,47 @@ export default function Mdeditor() {
 
         setMarkdownInput(textBeforeCaret + imageMarkdown + textAfterCaret);
     }
+    function insertOrderedList() {
+        const textarea = document.getElementById("whereitallis");
+        const startOfLine = getCaretStartOfLine();
+        const endOfLine = getCaretEndOfLine();
+        const before = markdownInput.substring(0, startOfLine);
+        const after = markdownInput.substring(endOfLine);
+        const lineText = markdownInput.substring(startOfLine, endOfLine);
+        const linesBefore = before.split("\n");
+        let lastNumber = 0;
+
+        // Check the previous line for a number
+        if (linesBefore.length > 0) {
+            const lastLine = linesBefore[linesBefore.length - 1];
+            const match = lastLine.match(/^(\d+)\./);
+            if (match) {
+                lastNumber = parseInt(match[1]);
+            }
+        }
+
+        // Insert or increment the list number
+        const newListLine = `${lastNumber + 1}. ${lineText}`;
+        setMarkdownInput(before + newListLine + after);
+    }
+    function insertLink() {
+        const textarea = document.getElementById("whereitallis");
+        const selectionStart = textarea.selectionStart;
+        const selectionEnd = textarea.selectionEnd;
+        const beforeSelection = markdownInput.substring(0, selectionStart);
+        const selectedText =
+            markdownInput.substring(selectionStart, selectionEnd) ||
+            "Link Text";
+        const afterSelection = markdownInput.substring(selectionEnd);
+
+        // Prompt user for URL
+        const url = prompt("Enter the URL:", "http://example.com");
+
+        if (url) {
+            const markdownLink = `[${selectedText}](${url})`;
+            setMarkdownInput(beforeSelection + markdownLink + afterSelection);
+        }
+    }
 
     return (
         <div className="App">
@@ -200,24 +241,20 @@ export default function Mdeditor() {
             <div className="wrapperer">
                 <div className="wrapper">
                     <div
+                        className="grey"
                         style={{
                             display: "flex",
                             flexDirection: "row",
                             alignItems: "center",
                             justifyContent: "center",
                         }}>
-                        <FiEye></FiEye>
+                        <FiPenTool></FiPenTool>
 
                         <div className="head">&nbsp;MARKDOWN</div>
                     </div>
-                    <div>
+                    <div className="grey">
                         <button
-                            style={{
-                                border: " 2px solid gray",
-                                padding: "10px",
-                                width: "50px",
-                                borderRadius: "10px",
-                            }}
+                            className="helperbutton"
                             onClick={() => {
                                 boldSelected();
                             }}>
@@ -225,23 +262,13 @@ export default function Mdeditor() {
                         </button>
 
                         <button
-                            style={{
-                                border: "2px solid gray",
-                                padding: "10px",
-                                width: "50px",
-                                borderRadius: "10px",
-                            }}
+                            className="helperbutton"
                             onClick={toggleItalics}>
                             <i>I</i>
                         </button>
                         <span>
                             <button
-                                style={{
-                                    border: " 2px solid gray",
-                                    padding: "10px",
-                                    width: "50px",
-                                    borderRadius: "10px",
-                                }}
+                                className="helperbutton"
                                 onClick={() => {
                                     addHeading();
                                 }}>
@@ -263,35 +290,25 @@ export default function Mdeditor() {
                         </span>
 
                         <button
-                            style={{
-                                border: "2px solid gray",
-                                padding: "10px",
-                                width: "50px",
-                                borderRadius: "10px",
-                            }}
+                            className="helperbutton"
                             onClick={addBulletPoints}>
                             <li></li>
                         </button>
                         <button
-                            style={{
-                                border: "2px solid gray",
-                                padding: "10px",
-                                borderRadius: "10px",
-                                width: "50px",
-                            }}
+                            className="helperbutton"
+                            onClick={insertOrderedList}>
+                            1.
+                        </button>
+                        <button
+                            className="helperbutton"
                             onClick={toggleUnderline}>
                             <u>U</u>
                         </button>
-                        <button
-                            style={{
-                                border: "2px solid gray",
-                                width: "50px",
-                                height: "50px",
-                                padding: "10px",
-                                borderRadius: "10px",
-                            }}
-                            onClick={insertImage}>
-                            <img src="/"></img>
+                        <button className="helperbutton" onClick={insertImage}>
+                            <FiImage></FiImage>
+                        </button>
+                        <button className="helperbutton" onClick={insertLink}>
+                            <FiLink2></FiLink2>
                         </button>
                     </div>
                     <textarea
@@ -320,6 +337,7 @@ export default function Mdeditor() {
                 </div>
                 <div className="wrapper">
                     <div
+                        className="grey"
                         style={{
                             display: "flex",
                             flexDirection: "row",

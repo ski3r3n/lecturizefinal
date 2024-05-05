@@ -1,143 +1,162 @@
 .woahitswulzy {
-  background: orange;
+    background: orange;
 }
 body {
-  height: 100vh;
-  width: 100%;
+    height: 100vh;
+    width: 100%;
 }
 .App {
-  display: flex;
-  width: calc(100%-250px);
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  margin-left: 250px;
-  align-items: center;
+    display: flex;
+    width: calc(100%-250px);
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    margin-left: 250px;
+    align-items: center;
 }
 .wrapperer {
-  display: flex;
-  flex-direction: row;
-  height: 100vh;
-  width: calc(100vw - 250px);
+    display: flex;
+    flex-direction: row;
+    height: 100vh;
+    width: calc(100vw - 250px);
 }
 .wrapper {
-  min-width: calc(46%);
-  height: 80%;
-  margin: 2%;
-  outline: none;
-  display: flex;
-  padding: 20px;
-  flex-direction: column;
-  border: 2px solid #ccc;
-  overflow: hidden;
-  overflow-y: auto;
+    min-width: calc(46%);
+    height: 80%;
+    margin: 2%;
+    outline: none;
+    display: flex;
+    padding: 20px;
+    flex-direction: column;
+    border: 2px solid #ccc;
+    overflow: hidden;
+    border-radius: 10px;
+    overflow-y: auto;
 }
 .head {
-  width: 100%;
-  height: 40px;
-  border-bottom: 1px solid #ddd;
-  display: flex;
-  align-items: center;
-  font-size: 15px;
+    width: 100%;
+    height: 40px;
+    border-bottom: 1px solid #ddd;
+    display: flex;
+    align-items: center;
+    font-size: 15px;
 }
 textarea {
-  padding: 15px;
-  border: none;
-  outline: none !important;
-  width: 96%;
-  height: 100%;
-  overflow-x: hidden;
-  font-size: 17px;
-  resize: none;
-  background: #fff;
+    padding: 15px;
+    border: none;
+    outline: none !important;
+    width: 96%;
+    height: 100%;
+    overflow-x: hidden;
+    font-size: 17px;
+    resize: none;
+    background: #fff;
 }
 .markdown {
-  padding: 15px;
-  border: none;
-  outline: none !important;
-  width: 96%;
-  height: 100%;
-  resize: none;
-  overflow-x: hidden;
-  background: #fff;
+    padding: 15px;
+    border: none;
+    outline: none !important;
+    width: 96%;
+    height: 100%;
+    resize: none;
+    overflow-x: hidden;
+    background: #fff;
 }
 h1 {
-  display: block;
-  font-size: 2em;
-  margin-top: 0.67em;
-  margin-bottom: 0.67em;
-  margin-left: 0;
-  margin-right: 0;
-  font-weight: bold;
+    display: block;
+    font-size: 2em;
+    margin-top: 0.67em;
+    margin-bottom: 0.67em;
+    margin-left: 0;
+    margin-right: 0;
+    font-weight: bold;
 }
 h2 {
-  display: block;
-  font-size: 1.5em;
-  margin-top: 0.83em;
-  margin-bottom: 0.83em;
-  margin-left: 0;
-  margin-right: 0;
-  font-weight: bold;
+    display: block;
+    font-size: 1.5em;
+    margin-top: 0.83em;
+    margin-bottom: 0.83em;
+    margin-left: 0;
+    margin-right: 0;
+    font-weight: bold;
 }
 h3 {
-  display: block;
-  font-size: 1.17em;
-  margin-top: 1em;
-  margin-bottom: 1em;
-  margin-left: 0;
-  margin-right: 0;
-  font-weight: bold;
+    display: block;
+    font-size: 1.17em;
+    margin-top: 1em;
+    margin-bottom: 1em;
+    margin-left: 0;
+    margin-right: 0;
+    font-weight: bold;
 }
 h4 {
-  display: block;
-  margin-top: 1.33em;
-  margin-bottom: 1.33em;
-  margin-left: 0;
-  margin-right: 0;
-  font-weight: bold;
+    display: block;
+    margin-top: 1.33em;
+    margin-bottom: 1.33em;
+    margin-left: 0;
+    margin-right: 0;
+    font-weight: bold;
 }
 h5 {
-  display: block;
-  font-size: 0.83em;
-  margin-top: 1.67em;
-  margin-bottom: 1.67em;
-  margin-left: 0;
-  margin-right: 0;
-  font-weight: bold;
+    display: block;
+    font-size: 0.83em;
+    margin-top: 1.67em;
+    margin-bottom: 1.67em;
+    margin-left: 0;
+    margin-right: 0;
+    font-weight: bold;
 }
 h6 {
-  display: block;
-  font-size: 0.67em;
-  margin-top: 2.33em;
-  margin-bottom: 2.33em;
-  margin-left: 0;
-  margin-right: 0;
-  font-weight: bold;
+    display: block;
+    font-size: 0.67em;
+    margin-top: 2.33em;
+    margin-bottom: 2.33em;
+    margin-left: 0;
+    margin-right: 0;
+    font-weight: bold;
 }
 #editor-container {
-  height: 200px;
+    height: 200px;
 }
 #container {
-  margin-left: 250px;
+    margin-left: 250px;
 }
 #markdown {
-  background-color: #eeffee;
-  min-height: 200px;
+    background-color: #eeffee;
+    min-height: 200px;
 }
 
 #output-quill {
-  background-color: #ffeeff;
-  min-height: 200px;
+    background-color: #ffeeff;
+    min-height: 200px;
 
-  ol .ql-indent-1 {
-    margin-left: 200px;
-  }
+    ol .ql-indent-1 {
+        margin-left: 200px;
+    }
 }
 
 #output-markdown {
-  background-color: #ffeeff;
-  min-height: 200px;
+    background-color: #ffeeff;
+    min-height: 200px;
 }
 li {
-  margin-left: 15px;
+    margin-left: 15px;
+}
+.helperbutton {
+    padding: 10px;
+    width: 50px !important;
+    height: 50px;
+}
+.helperbutton svg {
+    margin: auto;
+    padding: 0;
+}
+:where(img, svg, video, canvas, audio, iframe, embed, object) {
+    display: inherit !important;
+}
+.grey {
+    background-color: #eee;
+}
+a {
+    background-color: lightblue;
 }
