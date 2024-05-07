@@ -4,7 +4,7 @@
 [![forthebadge](http://forthebadge.com/images/badges/built-with-love.svg)](http://forthebadge.com)
 
 [![Author](https://img.shields.io/badge/author-ski3r3n_&_InsanelyAvner-lightgrey.svg?style=flat&color=%23673ab7)](https://github.com/ski3r3n)
-[![GitHub LICENSE](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/ski3r3n/lecturizefinal/LISENCE)
+[![GitHub LICENSE](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/ski3r3n/lecturizefinal?tab=MIT-1-ov-file)
 [![Release](https://img.shields.io/github/v/release/ski3r3n/lecturizefinal?style=flat&color=%23009688)](https://github.com/ski3r3n/lecturizefinal/releases)
 
 A platform that converts verbal teaching into concise, summarised revision notes using AI.
