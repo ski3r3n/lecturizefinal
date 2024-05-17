@@ -9,7 +9,7 @@
 
 A platform that converts verbal teaching into concise, summarised revision notes using AI.
 
-![](https://i.ibb.co/ZKLttKP/image.png)
+![](https://i.ibb.co/YfCtkVH/workflow-diagram.png)
 
 ## Table of contents
 
