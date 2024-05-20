@@ -1,4 +1,4 @@
-import { OpenAI } from "openai";
+/*import { OpenAI } from "openai";
 import multer from "multer";
 import fs from "fs";
 import path from "path";
@@ -68,4 +68,5 @@ export async function POST(req: NextRequest, res: NextResponse) {
   } else {
     res.status(200).json({ x: `Method not allowed ${req.method}` });
   }
-}
+}*/
+// shouldnt error now
