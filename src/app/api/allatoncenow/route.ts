@@ -12,15 +12,27 @@ const openai = new OpenAI({
 export const POST = async (req:NextRequest, res:any) => {
   const formData = await req.formData();
   const file = formData.get("file");
-
+    console.log("I have been summoned")
   if (!file) {
     return NextResponse.json({ error: "No files received." }, { status: 400 });
+    }
+    const buffer = Buffer.from(await file.arrayBuffer());
+  const filename =  file.name.replaceAll(" ", "_");
+  console.log(filename);
+  try {
+    await writeFile(
+      path.join(process.cwd(), "public/assets/" + filename),
+      buffer
+      );
+        console.log("AUDIO UPLOAD SUCCESS")
+
+  } catch (error) {
+    console.log("Error occured ", error);
+    return NextResponse.json({ Message: error, status: 500 });
   }
 
-  // const buffer = Buffer.from(await file.arrayBuffer());
-  const arrayBuffer = await file.arrayBuffer();
-  const audio = new Uint8Array(arrayBuffer);
-  console.log("AUDIO UPLOAD SUCCESS")
+  // const buffer = Buffer.from(await file.arrayBuffer()
+  const audio = new Uint8Array(buffer);
 
   // const filename = file.name.replaceAll(" ", "_");
   // const filePath = path.join(process.cwd(), "public/assets/" + filename);
@@ -31,7 +43,7 @@ export const POST = async (req:NextRequest, res:any) => {
     // Transcribe using OpenAI Whisper API
     console.log("TRANSSCRIBING AWAIT")
     const whisperResponse = await openai.audio.transcriptions.create({
-      file: fs.createReadStream("./public/harvard.wav"),
+      file: fs.createReadStream("./public/assets/recording.wav"),
       model: 'whisper-1'
     });
 

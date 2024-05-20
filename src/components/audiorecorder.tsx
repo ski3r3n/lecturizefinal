@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 
-function AudioRecorder() {
+function AudioRecorder() {  const [file, setFile] = useState(null);
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
   const [recording, setRecording] = useState(false);
   const [audioChunks, setAudioChunks] = useState<Blob[]>([]);
   const [paused, setPaused] = useState(false);
   const [timer, setTimer] = useState(0);
   const [audioURL, setAudioURL] = useState<string | null>(null);
+  const [audioFile, setAudioFile] = useState<File | null>(null);
 
   useEffect(() => {
     let interval: NodeJS.Timeout | null = null;
@@ -50,6 +51,8 @@ function AudioRecorder() {
         setAudioURL(audioUrl);
         setRecording(false);
         setPaused(false);
+        const audioFile = new File(audioChunks, 'recording.wav', { type: 'audio/wav' });
+        setAudioFile(audioFile);
         setTimer(0);  // Reset timer
       });
 
@@ -68,6 +71,8 @@ function AudioRecorder() {
         setPaused(false);
       } else {
         mediaRecorder?.stop();  // This will trigger 'stop' event and reset the state
+        
+
       }
     } else {
       startRecording();
@@ -80,17 +85,22 @@ function AudioRecorder() {
       setPaused(true);
     }
   };
-  const [file, setFile] = useState(null);
+
+  const handleFileChange = (event:any) => {
+    console.log("welp")
+    setFile(event.target.files[0]); 
+  };
   const handleSubmit = async (event: any) => {
+    console.log("WELP")
     event.preventDefault();
-    setFile(audioURL)
+    setFile(audioFile)
     if (!file) return;
 
     const formData = new FormData();
     formData.append("file", file);
 
     try {
-      const response = await fetch("/api/whisper", {
+      const response = await fetch("/api/allatoncenow", {
         method: "POST",
         body: formData,
       });
@@ -143,13 +153,13 @@ function AudioRecorder() {
           {formatTime(timer)}
         </div>
       </div>
-      <audio controls style={{ width: '100%', marginTop: '20px' }} src={audioURL}>
+      <audio controls style={{ width: '100%', marginTop: '20px' }} src={audioChunks.length > 0 ? URL.createObjectURL(new Blob(audioChunks)) : undefined} onChange={handleFileChange}>
         Your browser does not support the audio element.
       </audio>
       {audioURL && (
         <div>
           <button
-            onClick={saveRecording}
+            onClick={handleSubmit}
             style={{
               padding: '10px 20px',
               fontSize: '16px',
