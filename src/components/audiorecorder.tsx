@@ -1,4 +1,3 @@
-"use client"
 import React, { useState, useEffect } from 'react';
 
 function AudioRecorder() {
@@ -7,9 +6,10 @@ function AudioRecorder() {
   const [audioChunks, setAudioChunks] = useState<Blob[]>([]);
   const [paused, setPaused] = useState(false);
   const [timer, setTimer] = useState(0);
+  const [audioURL, setAudioURL] = useState<string | null>(null);
 
   useEffect(() => {
-    let interval:any;
+    let interval: NodeJS.Timeout | null = null;
 
     if (recording && !paused) {
       interval = setInterval(() => {
@@ -19,10 +19,12 @@ function AudioRecorder() {
       clearInterval(interval);
     }
 
-    return () => clearInterval(interval);
+    return () => {
+      if (interval) clearInterval(interval);
+    };
   }, [recording, paused]);
 
-  const formatTime = (timeInSeconds:any) => {
+  const formatTime = (timeInSeconds: number) => {
     const minutes = Math.floor(timeInSeconds / 60);
     const seconds = timeInSeconds % 60;
     return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
@@ -43,6 +45,9 @@ function AudioRecorder() {
       });
 
       recorder.addEventListener('stop', () => {
+        const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+        const audioUrl = URL.createObjectURL(audioBlob);
+        setAudioURL(audioUrl);
         setRecording(false);
         setPaused(false);
         setTimer(0);  // Reset timer
@@ -75,6 +80,27 @@ function AudioRecorder() {
       setPaused(true);
     }
   };
+  const [file, setFile] = useState(null);
+  const handleSubmit = async (event: any) => {
+    event.preventDefault();
+    setFile(audioURL)
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const response = await fetch("/api/whisper", {
+        method: "POST",
+        body: formData,
+      });
+      const data = await response.json();
+      console.log(data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  
 
   return (
     <div style={{ textAlign: 'center', marginTop: '50px' }}>
@@ -117,9 +143,29 @@ function AudioRecorder() {
           {formatTime(timer)}
         </div>
       </div>
-      <audio controls style={{ width: '100%', marginTop: '20px' }} src={audioChunks.length > 0 ? URL.createObjectURL(new Blob(audioChunks)) : undefined}>
+      <audio controls style={{ width: '100%', marginTop: '20px' }} src={audioURL}>
         Your browser does not support the audio element.
       </audio>
+      {audioURL && (
+        <div>
+          <button
+            onClick={saveRecording}
+            style={{
+              padding: '10px 20px',
+              fontSize: '16px',
+              fontWeight: 'bold',
+              borderRadius: '5px',
+              backgroundColor: '#2ecc71',
+              color: '#fff',
+              border: 'none',
+              cursor: 'pointer',
+              marginTop: '20px',
+            }}
+          >
+            Save Recording
+          </button>
+        </div>
+      )}
     </div>
   );
 }
