@@ -4,10 +4,10 @@ import { NextResponse } from "next/server";
 import { NextRequest } from "next/server";
 import path from "path";
 import { writeFile } from "fs/promises";
-
 export const POST = async (req: NextRequest, res: any) => {
+  
   const formData = await req.formData();
-  const file = formData.get("file");
+  const file = formData.get("file") as File;
   console.log("I have been summoned");
   if (!file) {
     return NextResponse.json({ error: "No files received." }, { status: 400 });

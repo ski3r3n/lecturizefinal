@@ -12,12 +12,11 @@ export default function UploadPage() {
   const handleSubmit = async (event:any) => {
     event.preventDefault();
     if (!file) return;
-
     const formData = new FormData();
     formData.append("file", file);
 
     try {
-      const response = await fetch("/api/whisper", {
+      const response = await fetch("/api/upload", {
         method: "POST",
         body: formData,
       });
