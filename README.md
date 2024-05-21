@@ -21,21 +21,20 @@ A platform that converts verbal teaching into concise, summarised revision notes
 
 ## Requirements
 
-* [NodeJS](https://nodejs.org/en)
-* A package manager
-  * eg `npm`, `yarn`, `pnpm` etc
+- [NodeJS](https://nodejs.org/en)
+- A package manager
+  - eg `npm`, `yarn`, `pnpm` etc
 
 ## Using Lecturize (website)
 
-* Visit [https://lecturizefinal.vercel.app/](https://lecturizefinal.vercel.app/)
+- Visit [https://lecturizefinal.vercel.app/](https://lecturizefinal.vercel.app/)
 
 ## Running the program locally
 
 1. Clone the repository `https://github.com/ski3r3n/lecturizefinal.git`
-    * Alternatively, you may choose to download this project as a `.zip` and unzip it.
+   - Alternatively, you may choose to download this project as a `.zip` and unzip it.
 2. Install required libraries `npm install`
 3. Run the local server `npm run dev`
-
 
 ## Contributing
 
@@ -47,6 +46,6 @@ Your contributions are always welcome! Feel free to fork this project and work o
 
 [(Back to top)](#table-of-contents)
 
-Copyright © 2024 by ski3r3n and InsanelyAvner.
+Copyright © 2024 by ski3r3n, InsanelyAvner and vvtte.
 
 This project is licensed under the MIT license - see the [LICENSE](LICENSE) file for details.
