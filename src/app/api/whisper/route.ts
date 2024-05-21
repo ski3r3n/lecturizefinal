@@ -10,7 +10,7 @@ const openai = new OpenAI({
 
 export const POST = async (req:NextRequest, res:any) => {
   const formData = await req.formData();
-  const file = formData.get("file");
+  const file = formData.get("file") as File;
 
   if (!file) {
     return NextResponse.json({ error: "No files received." }, { status: 400 });
