@@ -23,7 +23,7 @@ export const POST = async (req:NextRequest, res:any) => {
     await writeFile(
       path.join(process.cwd(), "public/assets/" + filename),
       buffer
-      );
+      ); // TODO: replace with database usage
         console.log("AUDIO UPLOAD SUCCESS")
 
   } catch (error) {
@@ -43,7 +43,7 @@ export const POST = async (req:NextRequest, res:any) => {
     // Transcribe using OpenAI Whisper API
     console.log("TRANSSCRIBING AWAIT")
     const whisperResponse = await openai.audio.transcriptions.create({
-      file: fs.createReadStream("./public/assets/recording.wav"),
+      file: file, // TODO: replace with getting from database
       model: 'whisper-1'
     });
 
