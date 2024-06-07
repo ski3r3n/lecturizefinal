@@ -16,23 +16,23 @@ export const POST = async (req:NextRequest, res:any) => {
   if (!file) {
     return NextResponse.json({ error: "No files received." }, { status: 400 });
     }
-    const buffer = Buffer.from(await file.arrayBuffer());
-  const filename =  file.name.replaceAll(" ", "_");
-  console.log(filename);
-  try {
-    await writeFile(
-      path.join(process.cwd(), "public/assets/" + filename),
-      buffer
-      ); // TODO: replace with database usage
-        console.log("AUDIO UPLOAD SUCCESS")
+    // const buffer = Buffer.from(await file.arrayBuffer());
+  // const filename =  file.name.replaceAll(" ", "_");
+  // console.log(filename);
+  // try {
+  //   await writeFile(
+  //     path.join(process.cwd(), "public/assets/" + filename),
+  //     buffer
+  //     ); // TODO: replace with database usage
+  //       console.log("AUDIO UPLOAD SUCCESS")
 
-  } catch (error) {
-    console.log("Error occured ", error);
-    return NextResponse.json({ Message: error, status: 500 });
-  }
+  // } catch (error) {
+  //   console.log("Error occured ", error);
+  //   return NextResponse.json({ Message: error, status: 500 });
+  // }
 
   // const buffer = Buffer.from(await file.arrayBuffer()
-  const audio = new Uint8Array(buffer);
+  // const audio = new Uint8Array(buffer);
 
   // const filename = file.name.replaceAll(" ", "_");
   // const filePath = path.join(process.cwd(), "public/assets/" + filename);
