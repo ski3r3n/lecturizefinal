@@ -1,0 +1,58 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id       Int         @id @default(autoincrement())
+  username String      @unique
+  name     String      // Full name of the user
+  email    String      @unique
+  password String
+  role     UserRole    @default(STUDENT) // Enum for user role
+  classes  UserClasses[]
+  notes    Note[]
+}
+
+model Class {
+  id          Int          @id @default(autoincrement())
+  name        String
+  description String
+  users       UserClasses[]
+  notes       Note[]
+}
+
+model UserClasses {
+  userId  Int
+  classId Int
+  user    User             @relation(fields: [userId], references: [id])
+  class   Class            @relation(fields: [classId], references: [id])
+  role    UserRole         // Specific role in this class (TEACHER or STUDENT)
+  @@id([userId, classId])
+}
+
+model Note {
+  id          Int    @id @default(autoincrement())
+  title       String
+  content     String
+  authorId    Int    // Reference to the user (teacher) who authored the note
+  classId     Int    // Link notes to a specific class
+  class       Class  @relation(fields: [classId], references: [id])
+  author      User   @relation(fields: [authorId], references: [id])
+}
+
+enum UserRole {
+  TEACHER
+  STUDENT
+}
