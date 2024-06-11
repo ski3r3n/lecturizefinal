@@ -35,6 +35,28 @@ import {
     FiChevronDown,
 } from "react-icons/fi";
 import { IconType } from "react-icons";
+import { useRouter } from 'next/navigation'
+import { PrismaClient } from '@prisma/client';
+import Cookies from 'js-cookie';
+import { jwtDecode } from 'jwt-decode';
+
+
+function getUserIdFromToken() {
+    const token = Cookies.get('auth');
+    if (token) {
+        try {
+            const decoded = jwtDecode(token);
+            console.log(decoded.userId)
+            return decoded.userId;  // Ensure your token has a 'userId' claim
+        } catch (error) {
+            console.error("Failed to decode token:", error);
+            return null;
+        }
+    }
+    console.log("no token")
+    console.log(Cookies.get())
+    return null;
+}
 
 interface LinkItemProps {
     name: string;
@@ -63,7 +85,10 @@ const LinkItems: Array<LinkItemProps> = [
     { name: "Settings", icon: FiSettings, link: "/dashboard" },
 ];
 
-const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
+const SidebarContent = ({ onClose, isTeacher, ...rest }: SidebarProps & { isTeacher: boolean }) => {
+    // Filter link items based on the isTeacher flag
+    const filteredLinkItems = LinkItems.filter(link => isTeacher || link.name !== "Record");
+
     return (
         <Box
             zIndex="2"
@@ -88,7 +113,7 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
                     onClick={onClose}
                 />
             </Flex>
-            {LinkItems.map((link) => (
+            {filteredLinkItems.map((link) => (
                 <NavItem key={link.name} icon={link.icon} link={link.link}>
                     {link.name}
                 </NavItem>
@@ -96,6 +121,7 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
         </Box>
     );
 };
+
 
 const NavItem = ({ icon, children, link, ...rest }: NavItemProps) => {
     return (
@@ -133,6 +159,23 @@ const NavItem = ({ icon, children, link, ...rest }: NavItemProps) => {
 };
 
 const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
+    const router = useRouter()
+
+    const handleLogout = async () => {
+        const response = await fetch('/api/auth/logout', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: ""
+        });
+    
+        if (response.ok) {
+          router.push('/')
+        } else {
+          alert('An error has occured');
+        }
+      };
     return (
         <Flex
             zIndex="2"
@@ -206,7 +249,7 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
                             <MenuItem>Settings</MenuItem>
                             <MenuItem>Billing</MenuItem>
                             <MenuDivider />
-                            <MenuItem>Sign out</MenuItem>
+                            <MenuItem onClick={() => {handleLogout()}}>Sign out</MenuItem>
                         </MenuList>
                     </Menu>
                 </Flex>
@@ -217,6 +260,7 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
 
 const SidebarWithHeader = ({ children } : any) => {
     const { isOpen, onOpen, onClose } = useDisclosure();
+    getUserIdFromToken()
 
     return (
         <>
@@ -224,6 +268,7 @@ const SidebarWithHeader = ({ children } : any) => {
                 <SidebarContent
                     onClose={() => onClose}
                     display={{ base: "none", md: "block" }}
+                    isTeacher={false}
                 />
                 <Drawer
                     isOpen={isOpen}
@@ -233,7 +278,7 @@ const SidebarWithHeader = ({ children } : any) => {
                     onOverlayClick={onClose}
                     size="full">
                     <DrawerContent>
-                        <SidebarContent onClose={onClose} />
+                        <SidebarContent onClose={onClose} isTeacher={false} />
                     </DrawerContent>
                 </Drawer>
                 {/* mobilenav */}

@@ -7,7 +7,7 @@ export async function middleware(req: NextRequest) {
     const token = req.cookies.get('auth');
     const { pathname } = req.nextUrl;
 
-    if (pathname.includes('/api') || pathname.includes('/_next') || pathname === '/login' || pathname === '/') {
+    if (pathname.includes('/api') || pathname.includes('/_next') || pathname === '/login') {
         return NextResponse.next();
     }
 
@@ -28,6 +28,10 @@ export async function middleware(req: NextRequest) {
         }
     } else {
         // No token found, redirect to login
-        return NextResponse.redirect(new URL('/login', req.url));
+        if (pathname === '/') {
+            return NextResponse.next();
+        } else {
+            return NextResponse.redirect(new URL('/login', req.url));
+        }
     }
 }
