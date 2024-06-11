@@ -11,7 +11,7 @@ export async function POST(req: Request){
     });
 
     if (user && password === user.password) {
-      return NextResponse.json({ message: 'Authenticated' }, { status: 200 })
+      return NextResponse.json({ message: 'Authenticated', id: user.id }, { status: 200 })
     } else {
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 })
     }
