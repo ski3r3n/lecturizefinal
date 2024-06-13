@@ -24,7 +24,7 @@ import { MdLocalShipping } from "react-icons/md";
 export default function Note() {
   return (
     <Container maxW={"7xl"}>
-      <SidebarWithHeader></SidebarWithHeader>
+      <SidebarWithHeader children={undefined} />
 
       <SimpleGrid
         columns={{ base: 1, lg: 2 }}
