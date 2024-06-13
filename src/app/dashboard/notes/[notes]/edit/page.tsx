@@ -4,7 +4,9 @@ import SidebarWithHeader from "@/components/sidebar";
 export default function Copiedcode() {
   return (
     <>
-      <SidebarWithHeader children={undefined} />
+      <SidebarWithHeader>
+        <></>
+      </SidebarWithHeader>
       <Mdeditor></Mdeditor>
     </>
   );
