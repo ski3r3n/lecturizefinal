@@ -38,6 +38,11 @@ import {
 import { IconType } from "react-icons";
 import { useRouter } from "next/navigation";
 
+interface User {
+  name: string;
+  role: string;
+}
+
 interface LinkItemProps {
   name: string;
   icon: IconType;
@@ -140,7 +145,7 @@ const NavItem = ({ icon, children, link, ...rest }: NavItemProps) => {
 };
 
 const MobileNav = ({ onOpen, ...rest }) => {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState<User | null>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -223,13 +228,13 @@ const MobileNav = ({ onOpen, ...rest }) => {
                   spacing="1px"
                   ml="2"
                 >
-                  <Skeleton isLoaded={user}>
+                  <Skeleton isLoaded={user ? true : false}>
                     <Text fontSize="sm">
                       {user ? user.name : "PLACEHOLDER"}
                     </Text>
                   </Skeleton>
 
-                  <Skeleton isLoaded={user}>
+                  <Skeleton isLoaded={user ? true : false}>
                     <Text fontSize="xs" color="gray.600">
                       {user ? user.role : "STUDENT"}
                     </Text>
@@ -259,7 +264,7 @@ const MobileNav = ({ onOpen, ...rest }) => {
 
 const SidebarWithHeader = ({ children }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -273,7 +278,7 @@ const SidebarWithHeader = ({ children }) => {
         });
 
         if (response.ok) {
-          const data = await response.json();
+          const data = (await response.json()) as User; // Cast the response data to User type
           setUser(data);
         } else {
           console.error("Failed to fetch user data");
