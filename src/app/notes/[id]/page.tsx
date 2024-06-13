@@ -2,23 +2,22 @@
 import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
-export async function loader(id) {
-  const note = await prisma.note.findUnique({
-    where: { id: parseInt(id) },
-  });
-
-  if (!note) {
-    throw new Response("Not Found", { status: 404 });
-  }
-
-  console.log(note)
-  console.log("loaded")
-
-  return note;
-}
-
 
 export default function NotePage({ params }: { params: { id: string } }) {
+  async function loader(id) {
+    const note = await prisma.note.findUnique({
+      where: { id: parseInt(id) },
+    });
+  
+    if (!note) {
+      throw new Response("Not Found", { status: 404 });
+    }
+  
+    console.log(note)
+    console.log("loaded")
+  
+    return note;
+  }
   const note = loader(params.id);
 
   return (
