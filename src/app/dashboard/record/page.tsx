@@ -1,64 +1,29 @@
-"use client";
-import Image from "next/image";
-import {
-    Button,
-    ButtonGroup,
-    Tabs,
-    TabList,
-    TabPanels,
-    Tab,
-    TabIndicator,
-    Link,
-    TabPanel,
-    Checkbox,
-    Card,
-    Stack,
-    StackDivider,
-    CardHeader,
-    CardBody,
-    CardFooter,
-    Box,
-    Input,
-    Heading,
-    Text,
-    List,
-    ListItem,
-    ListIcon,
-    OrderedList,
-    UnorderedList,
-} from "@chakra-ui/react";
-import SidebarWithHeader from "@/components/sidebar";
-import Navbar from "@/components/navbar";
-import Recordingcard from "@/components/recordingcard";
-import AudioRecorder from "@/components/audiorecorder";
-import AudioRecorder2 from "@/components/audiorecorder2";
+import { Box, Container, Flex, VStack, Heading } from "@chakra-ui/react";
+import SidebarWithHeader from "@/components/SidebarWithHeader";
+import AudioRecorder from "@/components/AudioRecorder";
+
 export default function Dashboard() {
-    var recording = 0;
-    return (
-        <>
-            <Box
-                zIndex="1"
-                display="flex"
-                flexDir="column"
-                position="fixed"
-                height="100vh"
-                width="100vw"
-                bgColor="#f3f5f8">
-                <SidebarWithHeader> </SidebarWithHeader>
-                <Box
-                    display="flex"
-                    flexWrap="wrap"
-                    flexDirection="column"
-                    ml="250px">
-                    <Heading margin="auto" mt="20vh" mb="20px">
-                        Record
-                    </Heading>
-                    <AudioRecorder2></AudioRecorder2>
-                </Box>
-                <br></br>
-                <br></br>
-                <br></br>
-            </Box>
-        </>
-    );
+  return (
+    <Box
+      zIndex="1"
+      display="flex"
+      flexDir="column"
+      position="fixed"
+      height="100vh"
+      width="100vw"
+      overflow="scroll"
+      bgColor="#f3f5f8"
+    >
+      <SidebarWithHeader>
+        <Flex minHeight="100vh" bgColor="#f3f5f8" ml="0">
+          <Container maxW="container.xl" flex="1" py={5}>
+            <VStack spacing={4} align="stretch">
+              <Heading textAlign="center">Record</Heading>
+              <AudioRecorder />
+            </VStack>
+          </Container>
+        </Flex>
+      </SidebarWithHeader>
+    </Box>
+  );
 }

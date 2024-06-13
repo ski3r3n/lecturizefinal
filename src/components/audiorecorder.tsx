@@ -1,5 +1,25 @@
+"use client"
 import React, { useState, useEffect, useRef } from "react";
+import {
+  Button,
+  Box,
+  Text,
+  Center,
+  VStack,
+  useColorModeValue,
+  FormControl,
+  FormLabel,
+  Select,
+  Input,
+} from "@chakra-ui/react";
+
+interface Class {
+  id: number;
+  name: string;
+}
+
 let autoclick = 0;
+
 function AudioRecorder() {
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(
     null
@@ -11,6 +31,48 @@ function AudioRecorder() {
   const [audioURL, setAudioURL] = useState<string | null>(null);
   const [audioFile, setAudioFile] = useState<File | null>(null);
   const saveButtonRef = useRef<HTMLButtonElement | null>(null);
+
+  // dropdown
+  const [classes, setClasses] = useState<Class[]>([]);
+  const [selectedClass, setSelectedClass] = useState("");
+  const [selectedSubject, setSelectedSubject] = useState("MA"); // Default to Mathematics
+  const subjectOptions = {
+    MA: "Mathematics",
+    ELL: "English Language & Literature",
+    TP: "Thinking Programme",
+    HC: "Higher Chinese",
+    PE: "Physical Education",
+    ACC: "Appreciation of Chinese Culture",
+    LSS: "Lower Secondary Science",
+    HI: "History",
+    GE: "Geography",
+    ART: "Art",
+    IF: "Infocomm",
+  };
+
+  useEffect(() => {
+    const fetchClasses = async () => {
+      const response = await fetch("/api/classes");
+      const data = await response.json();
+      setClasses(data);
+    };
+
+    fetchClasses();
+  }, []);
+
+  // Dropdown for selecting class
+  const classOptions = classes.map((cls) => (
+    <option key={cls.id} value={cls.id}>
+      {cls.name}
+    </option>
+  ));
+
+  // Dropdown for selecting subject
+  const subjectDropdown = Object.entries(subjectOptions).map(([key, value]) => (
+    <option key={key} value={key}>
+      {value}
+    </option>
+  ));
 
   useEffect(() => {
     let interval: NodeJS.Timeout | null = null;
@@ -107,14 +169,24 @@ function AudioRecorder() {
     }
   };
 
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files && event.target.files[0]) {
+      const file = event.target.files[0];
+      setAudioFile(file);
+      setAudioURL(URL.createObjectURL(file));
+    }
+  };
+
   const uploadFile = async () => {
-    if (!audioFile) {
-      console.error("No audio file available for upload.");
+    if (!audioFile || !selectedClass || !selectedSubject) {
+      console.error("All fields are required.");
       return;
     }
 
     const formData = new FormData();
     formData.append("file", audioFile);
+    formData.append("classId", selectedClass);
+    formData.append("subject", selectedSubject);
 
     try {
       const response = await fetch("/api/allatoncenow", {
@@ -128,82 +200,103 @@ function AudioRecorder() {
     }
   };
 
+  const recordingColor = useColorModeValue("#e74c3c", "#ff0000");
+  const pauseColor = useColorModeValue("#3498db", "#2980b9");
+  const saveColor = useColorModeValue("#2ecc71", "#27ae60");
+
   return (
-    <div style={{ textAlign: "center", marginTop: "50px" }}>
-      <button
-        onClick={toggleRecording}
-        ref={saveButtonRef}
-        style={{
-          padding: "20px 40px",
-          fontSize: "24px",
-          fontWeight: "bold",
-          borderRadius: "10px",
-          backgroundColor: recording ? "#e74c3c" : "#ff0000",
-          color: "#fff",
-          border: "none",
-          cursor: "pointer",
-          marginBottom: "20px",
-        }}>
-        {recording
-          ? paused
-            ? "Resume Recording"
-            : "Stop Recording"
-          : "Start Recording"}
-      </button>
-      <div>
+    <Center mt="50px">
+      <VStack spacing={4}>
+        <FormControl>
+          <FormLabel>Upload an Audio File</FormLabel>
+          <Input type="file" accept="audio/*" onChange={handleFileChange} />
+        </FormControl>
+        <Button
+          colorScheme={recording ? "red" : "green"}
+          onClick={toggleRecording}
+          ref={saveButtonRef}
+          size="lg"
+          borderRadius="lg"
+          px="8"
+          fontWeight="bold"
+        >
+          {recording
+            ? paused
+              ? "Resume Recording"
+              : "Stop Recording"
+            : "Start Recording"}
+        </Button>
+
         {recording && !paused && (
-          <button
+          <Button
             onClick={pauseRecording}
-            style={{
-              padding: "10px 20px",
-              fontSize: "16px",
-              fontWeight: "bold",
-              borderRadius: "5px",
-              backgroundColor: "#3498db",
-              color: "#fff",
-              border: "none",
-              cursor: "pointer",
-              marginRight: "10px",
-            }}>
+            colorScheme="blue"
+            size="md"
+            borderRadius="md"
+            fontWeight="bold"
+            mr="2"
+          >
             Pause
-          </button>
+          </Button>
         )}
-        <div
-          style={{
-            display: "inline-block",
-            fontSize: "20px",
-            fontWeight: "bold",
-            marginLeft: "auto",
-          }}>
+
+        <Text fontSize="xl" fontWeight="bold">
           {formatTime(timer)}
-        </div>
-      </div>
-      <audio
-        controls
-        style={{ width: "100%", marginTop: "20px" }}
-        src={audioURL!}>
-        Your browser does not support the audio element.
-      </audio>
-      {audioURL && (
-        <div>
-          <button
+        </Text>
+
+        <audio
+          controls
+          style={{ width: "100%", marginTop: "20px" }}
+          src={audioURL!}
+        >
+          Your browser does not support the audio element.
+        </audio>
+
+        {audioURL && (
+          <Button
             onClick={uploadFile}
-            style={{
-              padding: "10px 20px",
-              fontSize: "16px",
-              fontWeight: "bold",
-              borderRadius: "5px",
-              backgroundColor: "#2ecc71",
-              color: "#fff",
-              border: "none",
-              cursor: "pointer",
-              marginTop: "20px",
-            }}>
+            colorScheme="teal"
+            size="md"
+            borderRadius="md"
+            fontWeight="bold"
+            mt="4"
+          >
             Save Recording
-          </button>
-        </div>
-      )}
-    </div>
+          </Button>
+        )}
+
+        <FormControl isRequired>
+          <FormLabel htmlFor="class-select">Class</FormLabel>
+          <Select
+            id="class-select"
+            placeholder="Select a Class"
+            value={selectedClass}
+            onChange={(e) => setSelectedClass(e.target.value)}
+          >
+            {classes.map((cls) => (
+              <option key={cls.id} value={cls.id}>
+                {cls.name}
+              </option>
+            ))}
+          </Select>
+        </FormControl>
+
+        <FormControl isRequired>
+          <FormLabel htmlFor="subject-select">Subject</FormLabel>
+          <Select
+            id="subject-select"
+            value={selectedSubject}
+            onChange={(e) => setSelectedSubject(e.target.value)}
+          >
+            {Object.entries(subjectOptions).map(([key, value]) => (
+              <option key={key} value={key}>
+                {value}
+              </option>
+            ))}
+          </Select>
+        </FormControl>
+      </VStack>
+    </Center>
   );
 }
 

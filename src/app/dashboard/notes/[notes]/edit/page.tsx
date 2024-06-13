@@ -1,5 +1,5 @@
 import Mdeditor from "@/components/mdeditor.js";
-import SidebarWithHeader from "@/components/sidebar";
+import SidebarWithHeader from "@/components/SidebarWithHeader";
 
 export default function Copiedcode() {
   return (

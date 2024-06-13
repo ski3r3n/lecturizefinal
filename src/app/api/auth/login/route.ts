@@ -18,7 +18,7 @@ export async function POST(req: Request) {
       const token = jwt.sign(
         { userId: user.id }, // Payload
         JWT_SECRET,
-        { expiresIn: '12h' } // Token expiry time, adjust as needed
+        { expiresIn: '365d' } // Token expiry time, adjust as needed
       );
 
       // Serialize the cookie

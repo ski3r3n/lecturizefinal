@@ -1,9 +1,8 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { Box } from "@chakra-ui/react";
-import SidebarWithHeader from "@/components/sidebar";
-import Recordingcard from "@/components/recordingcard"; // Ensure this is used or remove it if unnecessary
-import NoteCard from "@/components/noteCard";
+import SidebarWithHeader from "@/components/SidebarWithHeader";
+import NoteCard from "@/components/NoteCard";
 
 const subjectFullNames = {
   MA: "Mathematics",

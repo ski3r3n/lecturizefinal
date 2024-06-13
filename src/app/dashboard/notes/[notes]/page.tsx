@@ -1,5 +1,5 @@
 "use client";
-import SidebarWithHeader from "@/components/sidebar";
+import SidebarWithHeader from "@/components/SidebarWithHeader";
 import {
   Box,
   chakra,
