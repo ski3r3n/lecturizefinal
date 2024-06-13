@@ -1,15 +1,23 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, Subject } from "@prisma/client";
 import { NextResponse } from "next/server";
 
 const prisma = new PrismaClient();
 
 export async function POST(req: Request) {
-  const { title, content, authorId, classId } = await req.json();
+  const { title, content, authorId, classId, subject } = await req.json();
 
-  if (!title || !content || !authorId || !classId) {
+  if (!title || !content || !authorId || !classId || !subject) {
     return NextResponse.json(
       { message: "Missing required fields!" },
       { status: 401 }
+    );
+  }
+
+  // Optional: Validate that the subject is a valid enum value
+  if (!Object.values(Subject).includes(subject)) {
+    return NextResponse.json(
+      { message: "Invalid subject!" },
+      { status: 400 }
     );
   }
   
@@ -20,6 +28,7 @@ export async function POST(req: Request) {
         content,
         authorId,
         classId,
+        subject, // Added subject here
       },
     });
 

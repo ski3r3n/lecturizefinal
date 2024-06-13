@@ -6,9 +6,7 @@ import { PrismaClient } from "@prisma/client";
 const JWT_SECRET = new TextEncoder().encode("LecturizeOnTop");
 const prisma = new PrismaClient();
 
-export async function GET(req: Request) {
-  // Get user session
-  // Extract the JWT from the "auth" cookie
+export async function GET(req: NextRequest) {
   const cookieStore = cookies();
   const token = cookieStore.get("auth");
 
@@ -19,23 +17,30 @@ export async function GET(req: Request) {
     );
   }
 
-  const { payload } = await jwtVerify(token.value, JWT_SECRET);
-
   try {
+    const { payload } = await jwtVerify(token.value, JWT_SECRET);
+
+    // Assert that userId is a number
+    const userId = Number(payload.userId);
+    if (isNaN(userId)) {
+      return NextResponse.json(
+        { message: "Invalid user ID." },
+        { status: 400 }
+      );
+    }
+
     const user = await prisma.user.findUnique({
       where: {
-        id: payload.userId,
+        id: userId, // Use the asserted userId here
       },
       include: { class: true },
     });
 
     if (!user) {
-      return new Response(JSON.stringify({ error: "User not found." }), {
-        status: 404,
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      return NextResponse.json(
+        { message: "User not found." },
+        { status: 404 }
+      );
     }
 
     let notes;
@@ -50,18 +55,16 @@ export async function GET(req: Request) {
         include: { class: true, author: true },
       });
     } else {
-      return new Response(JSON.stringify({ error: "No notes available" }), {
-        status: 404,
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      return NextResponse.json(
+        { message: "No notes available." },
+        { status: 404 }
+      );
     }
 
     return NextResponse.json(notes, { status: 200 });
   } catch (error) {
     return NextResponse.json(
-      { error: "Something went wrong" },
+      { error: "Something went wrong." },
       { status: 500 }
     );
   }

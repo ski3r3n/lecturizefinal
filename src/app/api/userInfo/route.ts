@@ -1,37 +1,43 @@
 import { NextRequest, NextResponse } from "next/server";
 import { jwtVerify } from 'jose';
-import { cookies } from 'next/headers'
+import { cookies } from 'next/headers';
 import { PrismaClient } from '@prisma/client';
 
 const JWT_SECRET = new TextEncoder().encode('LecturizeOnTop');
 const prisma = new PrismaClient();
 
-export async function GET(req: Request) {
+export async function GET(req: NextRequest) {
     try {
-        // Extract the JWT from the "auth" cookie
-        const cookieStore = cookies()
-        const token = cookieStore.get('auth')
-        
-        
+        // Correctly extract the JWT from the "auth" cookie
+        const cookieStore = cookies();
+        const token = cookieStore.get('auth');
+
         if (!token) {
           return NextResponse.json({ message: "No authentication token found." }, { status: 401 });
         }
 
         const { payload } = await jwtVerify(token.value, JWT_SECRET);
 
+        // Assert that userId is a number
+        const userId = Number(payload.userId);
+        if (isNaN(userId)) {
+          return NextResponse.json(
+            { message: "Invalid user ID." },
+            { status: 400 }
+          );
+        }
+
         const user = await prisma.user.findUnique({
             where: {
-                id: payload.userId
+                id: userId // Using the number-casted userId
             }
         });
 
         if (!user) {
-            return new Response(JSON.stringify({ error: "User not found." }), {
-                status: 404,
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            });
+            return NextResponse.json(
+              { error: "User not found." },
+              { status: 404 }
+            );
         }
 
         return NextResponse.json(user, { status: 200 });
@@ -41,5 +47,4 @@ export async function GET(req: Request) {
           { status: 500 }
         );
     }
-    
-  }
+}

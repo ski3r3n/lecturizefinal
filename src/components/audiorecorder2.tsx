@@ -11,7 +11,14 @@ import {
   Select,
   Input,
 } from "@chakra-ui/react";
+
+interface Class {
+  id: number;
+  name: string;
+}
+
 let autoclick = 0;
+
 function AudioRecorder() {
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(
     null
@@ -25,7 +32,7 @@ function AudioRecorder() {
   const saveButtonRef = useRef<HTMLButtonElement | null>(null);
 
   // dropdown
-  const [classes, setClasses] = useState([]);
+  const [classes, setClasses] = useState<Class[]>([]);
   const [selectedClass, setSelectedClass] = useState("");
   const [selectedSubject, setSelectedSubject] = useState("MA"); // Default to Mathematics
   const subjectOptions = {
