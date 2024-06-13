@@ -51,8 +51,9 @@ export default function Dashboard() {
       >
         <SidebarWithHeader>
           <Box display="flex" flexWrap="wrap" ml="0">
-            {notes.map((note) => (
+            {notes.map((note, index) => (
               <NoteCard
+                key={index}
                 id={note.id}
                 title={note.title}
                 content={note.content}
