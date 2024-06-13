@@ -31,6 +31,7 @@ import SidebarWithHeader from "@/components/sidebar";
 import Navbar from "@/components/navbar";
 import Recordingcard from "@/components/recordingcard";
 import AudioRecorder from "@/components/audiorecorder";
+import AudioRecorder2 from "@/components/audiorecorder2";
 export default function Dashboard() {
     var recording = 0;
     return (
@@ -52,7 +53,7 @@ export default function Dashboard() {
                     <Heading margin="auto" mt="20vh" mb="20px">
                         Record
                     </Heading>
-                    <AudioRecorder></AudioRecorder>
+                    <AudioRecorder2></AudioRecorder2>
                 </Box>
                 <br></br>
                 <br></br>
