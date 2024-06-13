@@ -1,36 +1,42 @@
 "use client";
-import Image from "next/image";
-import {
-  Button,
-  ButtonGroup,
-  Tabs,
-  TabList,
-  TabPanels,
-  Tab,
-  TabIndicator,
-  Link,
-  TabPanel,
-  Checkbox,
-  Card,
-  Stack,
-  StackDivider,
-  CardHeader,
-  CardBody,
-  CardFooter,
-  Box,
-  Input,
-  Heading,
-  Text,
-  List,
-  ListItem,
-  ListIcon,
-  OrderedList,
-  UnorderedList,
-} from "@chakra-ui/react";
+import React, { useEffect, useState } from "react";
+import { Box, Skeleton, Text } from "@chakra-ui/react";
 import SidebarWithHeader from "@/components/sidebar";
-import Navbar from "@/components/navbar";
 import Recordingcard from "@/components/recordingcard";
+import NoteCard from "@/components/noteCard";
+
 export default function Dashboard() {
+  const [notes, setNotes] = useState([]);
+
+  const subjectFullNames = {
+    MA: "Mathematics",
+    ELL: "English Language & Literature",
+    TP: "Thinking Programme",
+    HC: "Higher Chinese",
+    PE: "Physical Education",
+    ACC: "Appreciation of Chinese Culture",
+    LSS: "Lower Secondary Science",
+    HI: "History",
+    GE: "Geography",
+    ART: "Art",
+    IF: "Infocomm",
+  };
+  
+
+  useEffect(() => {
+    async function fetchNotes() {
+      const response = await fetch("/api/notes/get");
+      if (response.ok) {
+        const data = await response.json();
+        setNotes(data);
+      } else {
+        console.error("Failed to fetch notes");
+      }
+    }
+
+    fetchNotes();
+  }, []);
+
   return (
     <>
       <Box
@@ -45,42 +51,21 @@ export default function Dashboard() {
       >
         <SidebarWithHeader>
           <Box display="flex" flexWrap="wrap" ml="0">
-            <Recordingcard
-              title="Lorem Ipsum"
-              preview="Dolor sit amet, consectetur adipiscing elit. Phasellus quis libero mauris. Integer at nisl sed lectus congue posuere. Etiam et sodales risus. Aliquam scelerisque tempor suscipit. Pellentesque feugiat quam ac pretium tincidunt. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Curabitur tempor, massa eget sollicitudin placerat, massa sapien ornare diam, sed cursus lorem purus sed tellus."
-              creator="Richard McClintock"
-              link="/dashboard/notes/placeholder"
-            ></Recordingcard>
-            <Recordingcard
-              title="Lorem Ipsum"
-              preview="Dolor sit amet, consectetur adipiscing elit. Phasellus quis libero mauris. Integer at nisl sed lectus congue posuere. Etiam et sodales risus. Aliquam scelerisque tempor suscipit. Pellentesque feugiat quam ac pretium tincidunt. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Curabitur tempor, massa eget sollicitudin placerat, massa sapien ornare diam, sed cursus lorem purus sed tellus."
-              creator="Richard McClintock"
-              link="/dashboard/notes/placeholder"
-            ></Recordingcard>
-            <Recordingcard
-              title="Lorem Ipsum"
-              preview="Dolor sit amet, consectetur adipiscing elit. Phasellus quis libero mauris. Integer at nisl sed lectus congue posuere. Etiam et sodales risus. Aliquam scelerisque tempor suscipit. Pellentesque feugiat quam ac pretium tincidunt. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Curabitur tempor, massa eget sollicitudin placerat, massa sapien ornare diam, sed cursus lorem purus sed tellus."
-              creator="Richard McClintock"
-              link="/dashboard/notes/placeholder"
-            ></Recordingcard>
-            <Recordingcard
-              title="Lorem Ipsum"
-              preview="Dolor sit amet, consectetur adipiscing elit. Phasellus quis libero mauris. Integer at nisl sed lectus congue posuere. Etiam et sodales risus. Aliquam scelerisque tempor suscipit. Pellentesque feugiat quam ac pretium tincidunt. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Curabitur tempor, massa eget sollicitudin placerat, massa sapien ornare diam, sed cursus lorem purus sed tellus."
-              creator="Richard McClintock"
-              link="/dashboard/notes/placeholder"
-            ></Recordingcard>
-            <Recordingcard
-              title="Lorem Ipsum"
-              preview="Dolor sit amet, consectetur adipiscing elit. Phasellus quis libero mauris. Integer at nisl sed lectus congue posuere. Etiam et sodales risus. Aliquam scelerisque tempor suscipit. Pellentesque feugiat quam ac pretium tincidunt. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Curabitur tempor, massa eget sollicitudin placerat, massa sapien ornare diam, sed cursus lorem purus sed tellus."
-              creator="Richard McClintock"
-              link="/dashboard/notes/placeholder"
-            ></Recordingcard>
+            {notes.map((note) => (
+              <NoteCard
+                id={note.id}
+                title={note.title}
+                content={note.content}
+                subject={subjectFullNames[note.subject] || note.subject}
+                createdAt={note.createdAt}
+                author={{
+                  name: note.author.name,
+                }}
+              />
+            ))}
           </Box>
         </SidebarWithHeader>
       </Box>
-      <br></br>
-      <br></br>
-      <br></br>
     </>
   );
 }

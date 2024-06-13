@@ -21,7 +21,7 @@ export async function GET(req: Request) {
 
         const user = await prisma.user.findUnique({
             where: {
-                id: payload.userId // Assuming your payload contains the userId
+                id: payload.userId
             }
         });
 

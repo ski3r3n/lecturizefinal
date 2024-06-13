@@ -4,7 +4,6 @@
 // Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
-
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
@@ -15,41 +14,50 @@ generator client {
 }
 
 model User {
-  id       Int         @id @default(autoincrement())
-  username String      @unique
-  name     String      // Full name of the user
-  email    String      @unique
+  id       Int     @id @default(autoincrement())
+  username String  @unique
+  name     String
+  email    String  @unique
   password String
-  role     UserRole    @default(STUDENT) // Enum for user role
-  classes  UserClasses[]
+  role     UserRole @default(STUDENT)
+  classId  Int?    // Nullable to allow users without a class
+  class    Class?  @relation(fields: [classId], references: [id])
   notes    Note[]
 }
 
 model Class {
-  id          Int          @id @default(autoincrement())
+  id          Int    @id @default(autoincrement())
   name        String
   description String
-  users       UserClasses[]
+  users       User[]
   notes       Note[]
 }
 
-model UserClasses {
-  userId  Int
-  classId Int
-  user    User             @relation(fields: [userId], references: [id])
-  class   Class            @relation(fields: [classId], references: [id])
-  role    UserRole         // Specific role in this class (TEACHER or STUDENT)
-  @@id([userId, classId])
+enum Subject {
+  MA   // Mathematics
+  ELL  // English Language & Literature
+  TP   // Thinking Programme
+  HC   // Higher Chinese
+  PE   // Physical Education
+  ACC  // Appreciation of Chinese Culture
+  LSS  // Lower Secondary Science
+  HI   // History
+  GE   // Geography
+  ART  // Art
+  IF   // Infocomm
 }
 
 model Note {
-  id          Int    @id @default(autoincrement())
+  id          Int       @id @default(autoincrement())
   title       String
   content     String
-  authorId    Int    // Reference to the user (teacher) who authored the note
-  classId     Int    // Link notes to a specific class
-  class       Class  @relation(fields: [classId], references: [id])
-  author      User   @relation(fields: [authorId], references: [id])
+  subject     Subject   // Enum for the subject of the note
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  authorId    Int
+  classId     Int?
+  class       Class?    @relation(fields: [classId], references: [id])
+  author      User      @relation(fields: [authorId], references: [id])
 }
 
 enum UserRole {
