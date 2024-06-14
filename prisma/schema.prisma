@@ -51,7 +51,8 @@ model Note {
   id          Int       @id @default(autoincrement())
   title       String
   content     String
-  subject     Subject   // Enum for the subject of the note
+  subject     Subject?   // Enum for the subject of the note
+  isVisible   Boolean   @default(false) // Added field to control visibility
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   authorId    Int
@@ -59,6 +60,7 @@ model Note {
   class       Class?    @relation(fields: [classId], references: [id])
   author      User      @relation(fields: [authorId], references: [id])
 }
+
 
 enum UserRole {
   TEACHER

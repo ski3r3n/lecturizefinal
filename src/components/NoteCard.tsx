@@ -37,7 +37,7 @@ export default function NoteCard({
     month: "long",
     day: "numeric",
   });
-  const notesLink = `/notes/${id}`;
+  const notesLink = `/dashboard/notes/${id}`;
 
   return (
     <Center py={6}>

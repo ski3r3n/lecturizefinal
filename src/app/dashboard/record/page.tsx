@@ -1,5 +1,4 @@
 import { Box, Container, Flex, VStack, Heading } from "@chakra-ui/react";
-import SidebarWithHeader from "@/components/SidebarWithHeader";
 import AudioRecorder from "@/components/AudioRecorder";
 
 export default function Dashboard() {
