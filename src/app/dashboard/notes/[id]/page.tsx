@@ -96,7 +96,7 @@ const NoteViewer = ({ params }: { params: { id: string } }) => {
           </Button>
         </HStack>
         <Divider />
-        <Text fontSize="lg" color={useColorModeValue('gray.600', 'gray.400')}>
+        <Text fontSize="lg" color={'gray.600'}>
           <Markdown remarkPlugins={[remarkGfm]}>{note.content}</Markdown>
         </Text>
         <HStack justify="left" mt={4}>
