@@ -187,8 +187,11 @@ const MobileNav = ({ onOpen, ...rest }) => {
 
   return (
     <Flex
-      zIndex="2"
-      ml={{ base: 0, md: 60 }}
+      zIndex="1" // Make sure zIndex is high enough to stay on top
+      position="fixed" // Changed from sticky to fixed
+      top={0} // Keep at the top
+      left={0} // Extend from the left edge of the viewport
+      right={0} // Extend to the right edge of the viewport
       px={{ base: 4, md: 4 }}
       height="20"
       alignItems="center"
@@ -314,7 +317,7 @@ const SidebarWithHeader = ({ children }) => {
           </DrawerContent>
         </Drawer>
         <MobileNav onOpen={onOpen} />
-        <Box ml={{ base: 0, md: 60 }} p="4">
+        <Box ml={{ base: 0, md: 60 }} mt={"80px"} p="4">
           {children}
         </Box>
       </Box>

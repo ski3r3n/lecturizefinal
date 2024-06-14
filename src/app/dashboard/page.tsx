@@ -1,8 +1,9 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { Box } from "@chakra-ui/react";
+import { Flex } from "@chakra-ui/react";
 import SidebarWithHeader from "@/components/SidebarWithHeader";
 import NoteCard from "@/components/NoteCard";
+import NoteCardSkeleton from "@/components/skeletons/NoteCardSkeleton";
 
 const subjectFullNames = {
   MA: "Mathematics",
@@ -32,7 +33,7 @@ interface Note {
 export default function Dashboard() {
   // Use the Note interface to type the state
   const [notes, setNotes] = useState<Note[]>([]);
-  
+
   useEffect(() => {
     async function fetchNotes() {
       const response = await fetch("/api/notes/get");
@@ -49,19 +50,9 @@ export default function Dashboard() {
 
   return (
     <>
-      <Box
-        zIndex="1"
-        display="flex"
-        flexDir="column"
-        position="fixed"
-        height="100vh"
-        width="100vw"
-        overflow="scroll"
-        bgColor="#f3f5f8"
-      >
-        <SidebarWithHeader>
-          <Box display="flex" flexWrap="wrap" ml="0">
-            {notes.map((note, index) => (
+      <Flex wrap="wrap" justifyContent="space-around">
+        {notes.length > 0
+          ? notes.map((note, index) => (
               <NoteCard
                 key={index}
                 id={note.id}
@@ -71,10 +62,11 @@ export default function Dashboard() {
                 createdAt={note.createdAt}
                 author={note.author}
               />
-            ))}
-          </Box>
-        </SidebarWithHeader>
-      </Box>
+            ))
+          : new Array(3)
+              .fill(null)
+              .map((_, index) => <NoteCardSkeleton key={index} />)}
+      </Flex>
     </>
   );
 }

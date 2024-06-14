@@ -26,9 +26,14 @@ import {
   UnorderedList,
 } from "@chakra-ui/react";
 import Navbar from "@/components/Navbar";
+import Head from 'next/head'
+
 export default function Home() {
   return (
     <>
+      <Head>
+        <title>Lecturize</title>
+      </Head>
       <Box bgColor="#f3f5f8" w="100vw" h="100vh">
         <Navbar loggedin={0}></Navbar>
         <br></br>
