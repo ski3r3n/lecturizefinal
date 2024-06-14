@@ -80,9 +80,6 @@ export default function Navbar(props) {
               Lecturise
             </Tab>
           </Link>
-          <Link marginLeft="auto" display="fex" href="/about">
-            <Tab marginLeft="auto">About</Tab>
-          </Link>
           <Link display="fex" href="/login">
             <Tab marginLeft="auto">Login</Tab>
           </Link>
