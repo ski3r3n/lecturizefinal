@@ -60,14 +60,12 @@ function AudioRecorder() {
     fetchClasses();
   }, []);
 
-  // Dropdown for selecting class
   const classOptions = classes.map((cls) => (
     <option key={cls.id} value={cls.id}>
       {cls.name}
     </option>
   ));
 
-  // Dropdown for selecting subject
   const subjectDropdown = Object.entries(subjectOptions).map(([key, value]) => (
     <option key={key} value={key}>
       {value}
