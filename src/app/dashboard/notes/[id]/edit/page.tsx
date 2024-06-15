@@ -29,7 +29,7 @@ interface Class {
 }
 
 interface User {
-  id: number
+  id: number;
 }
 
 const MarkdownEditorPage = ({ params }: { params: { id: string } }) => {
@@ -41,6 +41,7 @@ const MarkdownEditorPage = ({ params }: { params: { id: string } }) => {
   const [classes, setClasses] = useState<Class[]>([]);
   const [selectedClass, setSelectedClass] = useState("");
   const [selectedSubject, setSelectedSubject] = useState("");
+  const [noteId, setNoteId] = useState("");
   const router = useRouter();
   const toast = useToast();
 
@@ -88,14 +89,15 @@ const MarkdownEditorPage = ({ params }: { params: { id: string } }) => {
         return res.json();
       })
       .then((data) => {
-        setTitle(data.note.title)
-        setSelectedClass(data.note.class.id)
-        setSelectedSubject(data.note.subject)
+        setTitle(data.note.title);
+        setSelectedClass(data.note.class.id);
+        setSelectedSubject(data.note.subject);
         setNoteContent(data.note.content);
         setDescription(data.note.description);
+        setNoteId(data.note.id);
       })
       .catch((error) => {
-        console.log(`Everything is perfectly fine: ${error}`)
+        console.log(`Everything is perfectly fine: ${error}`);
       });
   }, []);
 
@@ -111,56 +113,72 @@ const MarkdownEditorPage = ({ params }: { params: { id: string } }) => {
       },
       credentials: "include", // Ensure cookies are sent
     })
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('Failed to fetch user information');
-      }
-      return response.json();
-    })
-    .then(data => {
-      setUser(data); // Assuming setUser updates state or context
-      // Now make the second API call to create a note
-      return fetch("/api/notes/create", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          title: title,
-          content: noteContent,
-          subject: selectedSubject,
-          classId: Number(selectedClass),
-          authorId: data.id, // Use the fetched user ID
-          description: description
-        }),
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Failed to fetch user information");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        setUser(data); // Assuming setUser updates state or context
+        // Now make the second API call to create a note
+        if (creatingNote) {
+          return fetch("/api/notes/create", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              title: title,
+              content: noteContent,
+              subject: selectedSubject,
+              classId: Number(selectedClass),
+              authorId: data.id, // Use the fetched user ID
+              description: description,
+            }),
+          });
+        } else {
+          return fetch("/api/notes/update", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              title: title,
+              content: noteContent,
+              subject: selectedSubject,
+              classId: Number(selectedClass),
+              noteId: Number(noteId), // Use the fetched user ID
+              description: description,
+            }),
+          });
+        }
+      })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Failed to save note");
+        }
+        return response.json();
+      })
+      .then((noteData) => {
+        toast({
+          title: "Note saved successfully.",
+          status: "success",
+          duration: 5000,
+          isClosable: true,
+        });
+        router.push("/dashboard");
+      })
+      .catch((error) => {
+        console.error("Error:", error.message);
+        toast({
+          title: "Error",
+          description: error.message || "Please try again.",
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+        });
       });
-    })
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('Failed to save note');
-      }
-      return response.json();
-    })
-    .then(noteData => {
-      toast({
-        title: "Note saved successfully.",
-        status: "success",
-        duration: 5000,
-        isClosable: true,
-      });
-      router.push("/dashboard");
-    })
-    .catch(error => {
-      console.error('Error:', error.message);
-      toast({
-        title: "Error",
-        description: error.message || "Please try again.",
-        status: "error",
-        duration: 5000,
-        isClosable: true,
-      });
-    });
-    
   };
 
   return (
@@ -206,17 +224,16 @@ const MarkdownEditorPage = ({ params }: { params: { id: string } }) => {
             ))}
           </Select>
         </FormControl>
-        
       </Grid>
       <FormControl isRequired mt={4}>
-          <FormLabel htmlFor="description">Description</FormLabel>
-          <Input
-            id="description"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            placeholder="Enter description"
-          />
-        </FormControl>
+        <FormLabel htmlFor="description">Description</FormLabel>
+        <Input
+          id="description"
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          placeholder="Enter description"
+        />
+      </FormControl>
       <Box mt={6} border="1px" borderColor="gray.200" bg="white">
         <MdEditor
           style={{ height: "500px" }}
