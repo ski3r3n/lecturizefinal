@@ -1,7 +1,13 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import dynamic from "next/dynamic";
 import {
+  AlertDialog,
+  AlertDialogBody,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogContent,
+  AlertDialogOverlay,
   Box,
   Button,
   FormControl,
@@ -16,6 +22,7 @@ import {
   Text,
   Spinner,
   Center,
+  useDisclosure,
 } from "@chakra-ui/react";
 import { useRouter } from "next/navigation";
 
@@ -47,6 +54,8 @@ const MarkdownEditorPage = ({ params }: { params: { id: string } }) => {
   const [selectedSubject, setSelectedSubject] = useState("");
   const [noteId, setNoteId] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const cancelRef = useRef(null);
   const router = useRouter();
   const toast = useToast();
 
@@ -112,7 +121,7 @@ const MarkdownEditorPage = ({ params }: { params: { id: string } }) => {
   };
 
   const saveNote = async () => {
-    setIsLoading(true)
+    setIsLoading(true);
     fetch("/api/userInfo", {
       method: "GET",
       headers: {
@@ -162,22 +171,23 @@ const MarkdownEditorPage = ({ params }: { params: { id: string } }) => {
       })
       .then((response) => {
         if (!response.ok) {
-          setIsLoading(false)
+          setIsLoading(false);
           throw new Error("Failed to save note");
         }
         return response.json();
       })
       .then((noteData) => {
-        // toast({
-        //   title: "Note saved successfully.",
-        //   status: "success",
-        //   duration: 5000,
-        //   isClosable: true,
-        // });
-        router.push(`/dashboard/notes/${params.id}/edit/success`)
+        toast({
+          title: "Note saved successfully.",
+          description: "Your note has been successfully saved to the database",
+          status: "success",
+          duration: 5000,
+          isClosable: true,
+        });
+        router.push("/dashboard");
       })
       .catch((error) => {
-        setIsLoading(false)
+        setIsLoading(false);
         console.error("Error:", error.message);
         toast({
           title: "Error",
@@ -186,6 +196,44 @@ const MarkdownEditorPage = ({ params }: { params: { id: string } }) => {
           duration: 5000,
           isClosable: true,
         });
+      });
+  };
+
+  const handleDelete = () => {
+    onClose(); // Close the dialog
+    setIsLoading(true); // Show loading indicator
+
+    fetch(`/api/notes/delete/${noteId}`, {
+      method: "DELETE",
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Failed to delete the note");
+        }
+        return response.json();
+      })
+      .then(() => {
+        toast({
+          title: "Note deleted successfully.",
+          description: "The note has been removed from your records.",
+          status: "success",
+          duration: 5000,
+          isClosable: true,
+        });
+        router.push("/dashboard");
+      })
+      .catch((error) => {
+        console.error("Deletion error:", error);
+        toast({
+          title: "Error deleting note.",
+          description: error.message,
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+        });
+      })
+      .finally(() => {
+        setIsLoading(false); // Hide loading indicator
       });
   };
 
@@ -262,6 +310,36 @@ const MarkdownEditorPage = ({ params }: { params: { id: string } }) => {
           <Button mt={4} colorScheme="blue" onClick={saveNote}>
             Save Note
           </Button>
+          <Button ml={4} mt={4} colorScheme="red" onClick={onOpen}>
+            Delete Note
+          </Button>
+
+          <AlertDialog
+            isOpen={isOpen}
+            leastDestructiveRef={cancelRef}
+            onClose={onClose}
+          >
+            <AlertDialogOverlay>
+              <AlertDialogContent>
+                <AlertDialogHeader fontSize="lg" fontWeight="bold">
+                  Delete Note
+                </AlertDialogHeader>
+
+                <AlertDialogBody>
+                  Are you sure? You can't undo this action afterwards.
+                </AlertDialogBody>
+
+                <AlertDialogFooter>
+                  <Button ref={cancelRef} onClick={onClose}>
+                    Cancel
+                  </Button>
+                  <Button colorScheme="red" onClick={handleDelete} ml={3}>
+                    Delete
+                  </Button>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialogOverlay>
+          </AlertDialog>
         </>
       )}
     </Container>
