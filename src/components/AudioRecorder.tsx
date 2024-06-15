@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
 import {
   Button,
   Box,
@@ -13,6 +14,7 @@ import {
   Input,
   Spinner,
 } from "@chakra-ui/react";
+
 interface Class {
   id: number;
   name: string;
@@ -32,6 +34,7 @@ function AudioRecorder() {
   const [audioFile, setAudioFile] = useState<File | null>(null);
   const [isLoading, setIsLoading] = useState(false); // State to manage loading indicator
   const saveButtonRef = useRef<HTMLButtonElement | null>(null);
+  const router = useRouter();
 
   // dropdown
   const [classes, setClasses] = useState<Class[]>([]);
@@ -60,18 +63,6 @@ function AudioRecorder() {
 
     fetchClasses();
   }, []);
-
-  const classOptions = classes.map((cls) => (
-    <option key={cls.id} value={cls.id}>
-      {cls.name}
-    </option>
-  ));
-
-  const subjectDropdown = Object.entries(subjectOptions).map(([key, value]) => (
-    <option key={key} value={key}>
-      {value}
-    </option>
-  ));
 
   useEffect(() => {
     let interval: NodeJS.Timeout | null = null;
@@ -189,18 +180,27 @@ function AudioRecorder() {
     formData.append("classId", selectedClass);
     formData.append("subject", selectedSubject);
 
-    try {
-      const response = await fetch("/api/allatoncenow", {
-        method: "POST",
-        body: formData,
+    fetch("/api/allatoncenow", {
+      method: "POST",
+      body: formData,
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        console.log(data);
+        localStorage.setItem("markdownContent", data.summary);
+        localStorage.setItem("newNoteId", data.id);
+        setIsLoading(false); // Update loading state
+        router.push(`/dashboard/notes/${data.id}/edit`)
+      })
+      .catch((error) => {
+        console.error("There was a problem with the fetch operation:", error);
+        setIsLoading(false); // Update loading state
       });
-      const data = await response.json();
-      console.log(data);
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setIsLoading(false);
-    }
   };
 
   const recordingColor = useColorModeValue("#e74c3c", "#ff0000");
@@ -213,10 +213,10 @@ function AudioRecorder() {
     <Center mt="50px">
       <VStack spacing={4}>
         {isLoading ? (
-            <>
-              <Spinner size="xl" />
-              <Text mt={5}>Your recording is being processed...</Text>
-            </>
+          <>
+            <Spinner size="xl" />
+            <Text mt={5}>Your recording is being processed...</Text>
+          </>
         ) : (
           <>
             <FormControl>
