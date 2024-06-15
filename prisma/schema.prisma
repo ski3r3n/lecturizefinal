@@ -27,7 +27,7 @@ model User {
 
 model Class {
   id          Int    @id @default(autoincrement())
-  name        String
+  name        String @unique
   description String
   users       User[]
   notes       Note[]
@@ -50,6 +50,7 @@ enum Subject {
 model Note {
   id          Int       @id @default(autoincrement())
   title       String
+  description String?
   content     String
   subject     Subject?   // Enum for the subject of the note
   isVisible   Boolean   @default(false) // Added field to control visibility

@@ -4,9 +4,9 @@ import { NextResponse } from "next/server";
 const prisma = new PrismaClient();
 
 export async function POST(req: Request) {
-  const { title, content, authorId, classId, subject } = await req.json();
+  const { title, content, authorId, classId, subject, description } = await req.json();
 
-  if (!title || !content || !authorId || !classId || !subject) {
+  if (!title || !content || !authorId || !classId || !subject || !description) {
     return NextResponse.json(
       { message: "Missing required fields!" },
       { status: 401 }
@@ -28,12 +28,14 @@ export async function POST(req: Request) {
         content,
         authorId,
         classId,
-        subject, // Added subject here
+        subject,
+        description
       },
     });
 
     return NextResponse.json({ newNote }, { status: 200 });
   } catch (error) {
+    console.log(error)
     return NextResponse.json(
       { error: "Internal Server Error" },
       { status: 500 }

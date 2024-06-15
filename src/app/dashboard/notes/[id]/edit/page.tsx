@@ -28,7 +28,14 @@ interface Class {
   name: string;
 }
 
-const MarkdownEditorPage = () => {
+interface User {
+  id: number
+}
+
+const MarkdownEditorPage = ({ params }: { params: { id: string } }) => {
+  const [user, setUser] = useState<User | null>(null);
+  const [creatingNote, setCreatingNote] = useState(false);
+  const [description, setDescription] = useState("");
   const [noteContent, setNoteContent] = useState("");
   const [title, setTitle] = useState("");
   const [classes, setClasses] = useState<Class[]>([]);
@@ -67,35 +74,74 @@ const MarkdownEditorPage = () => {
 
     fetchClasses();
 
-    const content = localStorage.getItem('markdownContent');
-    if (content) {
-      setNoteContent(content);
-      console.log(content)
-    } else {
-      console.log("No note found!")
-    }
+    fetch(`/api/notes/get/${params.id}`)
+      .then((res) => {
+        if (!res.ok) {
+          const content = localStorage.getItem("markdownContent");
+          if (content) {
+            setCreatingNote(true);
+            setNoteContent(content);
+          } else {
+            alert("No note of ID found and no note to create!");
+          }
+        }
+        return res.json();
+      })
+      .then((data) => {
+        setTitle(data.note.title)
+        setSelectedClass(data.note.class.id)
+        setSelectedSubject(data.note.subject)
+        setNoteContent(data.note.content);
+        setDescription(data.note.description);
+      })
+      .catch((error) => {
+        console.log(`Everything is perfectly fine: ${error}`)
+      });
   }, []);
-
 
   const handleEditorChange = ({ text }) => {
     setNoteContent(text);
   };
 
   const saveNote = async () => {
-    const response = await fetch("/api/notes/create", {
-      method: "POST",
+    fetch("/api/userInfo", {
+      method: "GET",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        title,
-        content: noteContent,
-        selectedSubject,
-        selectedClass,
-      }),
-    });
-
-    if (response.ok) {
+      credentials: "include", // Ensure cookies are sent
+    })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Failed to fetch user information');
+      }
+      return response.json();
+    })
+    .then(data => {
+      setUser(data); // Assuming setUser updates state or context
+      // Now make the second API call to create a note
+      return fetch("/api/notes/create", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          title: title,
+          content: noteContent,
+          subject: selectedSubject,
+          classId: Number(selectedClass),
+          authorId: data.id, // Use the fetched user ID
+          description: description
+        }),
+      });
+    })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Failed to save note');
+      }
+      return response.json();
+    })
+    .then(noteData => {
       toast({
         title: "Note saved successfully.",
         status: "success",
@@ -103,15 +149,18 @@ const MarkdownEditorPage = () => {
         isClosable: true,
       });
       router.push("/dashboard");
-    } else {
+    })
+    .catch(error => {
+      console.error('Error:', error.message);
       toast({
-        title: "Error saving note.",
-        description: "Please try again.",
+        title: "Error",
+        description: error.message || "Please try again.",
         status: "error",
         duration: 5000,
         isClosable: true,
       });
-    }
+    });
+    
   };
 
   return (
@@ -136,17 +185,17 @@ const MarkdownEditorPage = () => {
             onChange={(e) => setSelectedSubject(e.target.value)}
           >
             {Object.entries(subjectOptions).map(([key, value]) => (
-                  <option key={key} value={key}>
-                    {value}
-                  </option>
-                ))}
+              <option key={key} value={key}>
+                {value}
+              </option>
+            ))}
           </Select>
         </FormControl>
         <FormControl isRequired>
           <FormLabel htmlFor="class">Class</FormLabel>
           <Select
             id="class"
-            placeholder="Select class"
+            placeholder={"Select class"}
             value={selectedClass}
             onChange={(e) => setSelectedClass(e.target.value)}
           >
@@ -157,7 +206,17 @@ const MarkdownEditorPage = () => {
             ))}
           </Select>
         </FormControl>
+        
       </Grid>
+      <FormControl isRequired mt={4}>
+          <FormLabel htmlFor="description">Description</FormLabel>
+          <Input
+            id="description"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            placeholder="Enter description"
+          />
+        </FormControl>
       <Box mt={6} border="1px" borderColor="gray.200" bg="white">
         <MdEditor
           style={{ height: "500px" }}

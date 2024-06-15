@@ -21,6 +21,7 @@ export async function GET(
       where: { id },
       include: {
         author: true, // Include the author data in the response
+        class: true
       },
     });
 

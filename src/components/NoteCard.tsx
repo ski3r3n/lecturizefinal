@@ -30,6 +30,7 @@ export default function NoteCard({
   subject,
   createdAt,
   author,
+  description
 }) {
   // Formatting the createdAt date for display
   const formattedDate = new Date(createdAt).toLocaleDateString("en-US", {
@@ -43,6 +44,7 @@ export default function NoteCard({
     <Center py={6}>
       <Box
         maxW={"300px"}
+        minW={"280px"}
         w={"full"}
         bg={useColorModeValue("white", "gray.900")}
         boxShadow={"2xl"}
@@ -92,7 +94,7 @@ export default function NoteCard({
           </Link>
 
           <Text color={"gray.500"}>
-            {truncateText(content, 90)} {/* Short preview or full content */}
+            {truncateText(description, 90)} {/* Short preview or full content */}
           </Text>
         </Stack>
         <Stack mt={6} direction={"row"} spacing={4} align={"center"}>

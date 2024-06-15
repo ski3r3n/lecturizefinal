@@ -23,6 +23,7 @@ interface Note {
   id: number;
   title: string;
   content: string;
+  description: string;
   subject: keyof typeof subjectFullNames; // Ensures subject keys match your defined subjects
   createdAt: string; // Adjust based on your actual date format, possibly Date
   author: {
@@ -61,6 +62,7 @@ export default function Dashboard() {
                 subject={subjectFullNames[note.subject] || note.subject}
                 createdAt={note.createdAt}
                 author={note.author}
+                description={note.description}
               />
             ))
           : new Array(3)
