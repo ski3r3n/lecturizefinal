@@ -23,13 +23,15 @@ const MdEditor = dynamic(() => import("react-markdown-editor-lite"), {
 import "react-markdown-editor-lite/lib/index.css";
 import Markdown from "react-markdown";
 
-interface Class {
-  id: number;
-  name: string;
-}
 
 interface User {
   id: number;
+}
+
+interface Class {
+  id: number;
+  name: string;
+  description: string;
 }
 
 const MarkdownEditorPage = ({ params }: { params: { id: string } }) => {
@@ -70,6 +72,7 @@ const MarkdownEditorPage = ({ params }: { params: { id: string } }) => {
     const fetchClasses = async () => {
       const response = await fetch("/api/classes");
       const data = await response.json();
+      console.log(data)
       setClasses(data);
     };
 
