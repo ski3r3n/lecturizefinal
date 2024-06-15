@@ -326,7 +326,7 @@ const MarkdownEditorPage = ({ params }: { params: { id: string } }) => {
                 </AlertDialogHeader>
 
                 <AlertDialogBody>
-                  Are you sure? You can't undo this action afterwards.
+                  Are you sure? You can&lsquo;t undo this action afterwards.
                 </AlertDialogBody>
 
                 <AlertDialogFooter>
