@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import React, { useState, useEffect, useRef } from "react";
 import {
   Button,
@@ -11,8 +11,8 @@ import {
   FormLabel,
   Select,
   Input,
+  Spinner,
 } from "@chakra-ui/react";
-
 interface Class {
   id: number;
   name: string;
@@ -30,6 +30,7 @@ function AudioRecorder() {
   const [timer, setTimer] = useState(0);
   const [audioURL, setAudioURL] = useState<string | null>(null);
   const [audioFile, setAudioFile] = useState<File | null>(null);
+  const [isLoading, setIsLoading] = useState(false); // State to manage loading indicator
   const saveButtonRef = useRef<HTMLButtonElement | null>(null);
 
   // dropdown
@@ -181,6 +182,8 @@ function AudioRecorder() {
       return;
     }
 
+    setIsLoading(true); // Set loading true when upload starts
+
     const formData = new FormData();
     formData.append("file", audioFile);
     formData.append("classId", selectedClass);
@@ -195,6 +198,8 @@ function AudioRecorder() {
       console.log(data);
     } catch (error) {
       console.error(error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -202,97 +207,109 @@ function AudioRecorder() {
   const pauseColor = useColorModeValue("#3498db", "#2980b9");
   const saveColor = useColorModeValue("#2ecc71", "#27ae60");
 
+  console.log(isLoading);
+
   return (
     <Center mt="50px">
       <VStack spacing={4}>
-        <FormControl>
-          <FormLabel>Upload an Audio File</FormLabel>
-          <Input type="file" accept="audio/*" onChange={handleFileChange} />
-        </FormControl>
-        <Button
-          colorScheme={recording ? "red" : "green"}
-          onClick={toggleRecording}
-          ref={saveButtonRef}
-          size="lg"
-          borderRadius="lg"
-          px="8"
-          fontWeight="bold"
-        >
-          {recording
-            ? paused
-              ? "Resume Recording"
-              : "Stop Recording"
-            : "Start Recording"}
-        </Button>
+        {isLoading ? (
+            <>
+              <Spinner size="xl" />
+              <Text mt={5}>Your recording is being processed...</Text>
+            </>
+        ) : (
+          <>
+            <FormControl>
+              <FormLabel>Upload an Audio File</FormLabel>
+              <Input type="file" accept="audio/*" onChange={handleFileChange} />
+            </FormControl>
+            <Button
+              colorScheme={recording ? "red" : "green"}
+              onClick={toggleRecording}
+              ref={saveButtonRef}
+              size="lg"
+              borderRadius="lg"
+              px="8"
+              fontWeight="bold"
+            >
+              {recording
+                ? paused
+                  ? "Resume Recording"
+                  : "Stop Recording"
+                : "Start Recording"}
+            </Button>
 
-        {recording && !paused && (
-          <Button
-            onClick={pauseRecording}
-            colorScheme="blue"
-            size="md"
-            borderRadius="md"
-            fontWeight="bold"
-            mr="2"
-          >
-            Pause
-          </Button>
+            {recording && !paused && (
+              <Button
+                onClick={pauseRecording}
+                colorScheme="blue"
+                size="md"
+                borderRadius="md"
+                fontWeight="bold"
+                mr="2"
+              >
+                Pause
+              </Button>
+            )}
+
+            <Text fontSize="xl" fontWeight="bold">
+              {formatTime(timer)}
+            </Text>
+
+            <audio
+              controls
+              style={{ width: "100%", marginTop: "20px" }}
+              src={audioURL!}
+            >
+              Your browser does not support the audio element.
+            </audio>
+
+            {audioURL && (
+              <Button
+                onClick={uploadFile}
+                colorScheme="teal"
+                size="md"
+                borderRadius="md"
+                fontWeight="bold"
+                mt="4"
+              >
+                Save Recording
+              </Button>
+            )}
+
+            <FormControl isRequired>
+              <FormLabel htmlFor="class-select">Class</FormLabel>
+              <Select
+                id="class-select"
+                placeholder="Select a Class"
+                value={selectedClass}
+                onChange={(e) => setSelectedClass(e.target.value)}
+              >
+                {classes.map((cls) => (
+                  <option key={cls.id} value={cls.id}>
+                    {cls.name}
+                  </option>
+                ))}
+              </Select>
+            </FormControl>
+
+            <FormControl isRequired>
+              <FormLabel htmlFor="subject-select">Subject</FormLabel>
+              <Select
+                id="subject-select"
+                value={selectedSubject}
+                onChange={(e) => setSelectedSubject(e.target.value)}
+              >
+                {Object.entries(subjectOptions).map(([key, value]) => (
+                  <option key={key} value={key}>
+                    {value}
+                  </option>
+                ))}
+              </Select>
+            </FormControl>
+          </>
         )}
-
-        <Text fontSize="xl" fontWeight="bold">
-          {formatTime(timer)}
-        </Text>
-
-        <audio
-          controls
-          style={{ width: "100%", marginTop: "20px" }}
-          src={audioURL!}
-        >
-          Your browser does not support the audio element.
-        </audio>
-
-        {audioURL && (
-          <Button
-            onClick={uploadFile}
-            colorScheme="teal"
-            size="md"
-            borderRadius="md"
-            fontWeight="bold"
-            mt="4"
-          >
-            Save Recording
-          </Button>
-        )}
-
-        <FormControl isRequired>
-          <FormLabel htmlFor="class-select">Class</FormLabel>
-          <Select
-            id="class-select"
-            placeholder="Select a Class"
-            value={selectedClass}
-            onChange={(e) => setSelectedClass(e.target.value)}
-          >
-            {classes.map((cls) => (
-              <option key={cls.id} value={cls.id}>
-                {cls.name}
-              </option>
-            ))}
-          </Select>
-        </FormControl>
-
-        <FormControl isRequired>
-          <FormLabel htmlFor="subject-select">Subject</FormLabel>
-          <Select
-            id="subject-select"
-            value={selectedSubject}
-            onChange={(e) => setSelectedSubject(e.target.value)}
-          >
-            {Object.entries(subjectOptions).map(([key, value]) => (
-              <option key={key} value={key}>
-                {value}
-              </option>
-            ))}
-          </Select>
-        </FormControl>
+        {/* Additional UI elements */}
       </VStack>
     </Center>
   );
