@@ -22,6 +22,7 @@ import { MdDownload, MdEdit } from "react-icons/md";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import Link from "next/link";
+import { jsPDF } from "jspdf";
 
 const subjectFullNames = {
   MA: "Mathematics",
@@ -92,6 +93,19 @@ const NoteViewer = ({ params }: { params: { id: string } }) => {
     fetchUser();
   }, [id]);
 
+  const generatePdf = () => {
+    const doc = new jsPDF();
+    doc.setFontSize(20);
+    doc.text(note.title, 10, 10);
+    doc.setFontSize(12);
+    doc.text(`Subject: ${subjectFullNames[note.subject] || note.subject}`, 10, 20);
+    doc.text(`Author: ${note.author.name}`, 10, 30);
+    doc.text(`Posted on: ${new Date(note.createdAt).toLocaleDateString()}`, 10, 40);
+    doc.text(note.content, 10, 50);
+
+    doc.save(`${note.title}.pdf`);
+  };
+
   if (isLoading) {
     return (
       <Container maxW="container.lg" py={10}>
@@ -126,7 +140,7 @@ const NoteViewer = ({ params }: { params: { id: string } }) => {
               <IconButton
                 icon={<MdDownload />}
                 colorScheme="blue"
-                onClick={() => alert("PDF download not implemented yet")}
+                onClick={generatePdf}
                 aria-label="Download PDF"
               />
             </Tooltip>
@@ -136,9 +150,6 @@ const NoteViewer = ({ params }: { params: { id: string } }) => {
                   <IconButton
                     icon={<MdEdit />}
                     colorScheme="teal"
-                    onClick={() => {
-                      /* navigate to edit page */
-                    }}
                     aria-label="Edit Note"
                   />
                 </Tooltip>
