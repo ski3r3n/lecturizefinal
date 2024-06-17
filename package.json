@@ -20,7 +20,7 @@
     "cookie": "^0.6.0",
     "framer-motion": "^11.0.20",
     "jose": "^5.4.0",
-    "jspdf": "^2.5.1"
+    "jspdf": "^2.5.1",
     "js-cookie": "^3.0.5",
     "jsonwebtoken": "^9.0.2",
     "jwt-decode": "^4.0.0",
