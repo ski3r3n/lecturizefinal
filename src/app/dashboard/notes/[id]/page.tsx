@@ -94,16 +94,18 @@ const NoteViewer = ({ params }: { params: { id: string } }) => {
   }, [id]);
 
   const generatePdf = () => {
+    if (!note) return; // Ensure the note is loaded before generating the PDF
+
     const doc = new jsPDF();
     doc.setFontSize(20);
-    doc.text(Note.title, 10, 10);
+    doc.text(note.title, 10, 10);
     doc.setFontSize(12);
-    doc.text(`Subject: ${subjectFullNames[note.subject] || Note.subject}`, 10, 20);
-    doc.text(`Author: ${Note.author.name}`, 10, 30);
-    doc.text(`Posted on: ${new Date(Note.createdAt).toLocaleDateString()}`, 10, 40);
-    doc.text(Note.content, 10, 50);
+    doc.text(`Subject: ${subjectFullNames[note.subject] || note.subject}`, 10, 20);
+    doc.text(`Author: ${note.author.name}`, 10, 30);
+    doc.text(`Posted on: ${new Date(note.createdAt).toLocaleDateString()}`, 10, 40);
+    doc.text(note.content, 10, 50);
 
-    doc.save(`${Note.title}.pdf`);
+    doc.save(`${note.title}.pdf`);
   };
 
   if (isLoading) {
