@@ -113,8 +113,15 @@ const generatePdf = async () => {
     });
 
     if (response.ok) {
-      const { url } = await response.json();
-      window.open(url, "_blank"); // Open PDF in a new tab for download
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.style.display = "none";
+      a.href = url;
+      a.download = `${note.title}.pdf`; // Set the file name here
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
     } else {
       console.error("Failed to generate PDF");
     }
@@ -122,6 +129,7 @@ const generatePdf = async () => {
     console.error("Error generating PDF:", error);
   }
 };
+
   if (isLoading) {
     return (
       <Container maxW="container.lg" py={10}>
