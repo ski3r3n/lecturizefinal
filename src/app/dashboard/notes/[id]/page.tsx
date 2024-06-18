@@ -114,11 +114,11 @@ const generatePdf = () => {
 
   const renderMarkdown = (text, size = 12, fontStyle = 'normal') => {
     doc.setFontSize(size);
-    doc.setFont(undefined, fontStyle);
+    doc.setFont('Helvetica', fontStyle);
 
-    const lines = doc.splitTextToSize(text, 180);
+    const lines = doc.splitTextToSize(text, 180); // Split text to fit within the page width
     lines.forEach((line) => {
-      if (yOffset + lineHeight > doc.internal.pageSize.height - 20) {
+      if (yOffset + lineHeight > doc.internal.pageSize.height - 20) { // Check if a new page is needed
         doc.addPage();
         yOffset = 20;
       }
@@ -130,14 +130,15 @@ const generatePdf = () => {
   const lines = note.content.split('\n');
   lines.forEach((line) => {
     if (line.startsWith('# ')) {
-      renderMarkdown(line.substring(2), 18, 'bold');
+      renderMarkdown(line.substring(2), 18, 'bold'); // H1
     } else if (line.startsWith('## ')) {
-      renderMarkdown(line.substring(3), 16, 'bold');
+      renderMarkdown(line.substring(3), 16, 'bold'); // H2
     } else if (line.startsWith('### ')) {
-      renderMarkdown(line.substring(4), 14, 'bold');
+      renderMarkdown(line.substring(4), 14, 'bold'); // H3
     } else if (line.startsWith('- ')) {
       renderMarkdown(`• ${line.substring(2)}`);
     } else {
+      // Handle inline Markdown for bold and italic
       const parts = line.split(/(\*\*|\*)/g);
       let isBold = false;
       let isItalic = false;
