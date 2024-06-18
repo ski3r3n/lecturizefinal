@@ -94,9 +94,10 @@ const NoteViewer = ({ params }: { params: { id: string } }) => {
     fetchUser();
   }, [id]);
 
-  const generatePdf = async () => {
-    if (!note) return; // Ensure the note is loaded before generating the PDF
+const generatePdf = async () => {
+  if (!note) return; // Ensure the note is loaded before generating the PDF
 
+  try {
     const response = await fetch("/api/generate-pdf", {
       method: "POST",
       headers: {
@@ -113,12 +114,14 @@ const NoteViewer = ({ params }: { params: { id: string } }) => {
 
     if (response.ok) {
       const { url } = await response.json();
-      window.open(url, "_blank");
+      window.open(url, "_blank"); // Open PDF in a new tab for download
     } else {
       console.error("Failed to generate PDF");
     }
-  };
-
+  } catch (error) {
+    console.error("Error generating PDF:", error);
+  }
+};
   if (isLoading) {
     return (
       <Container maxW="container.lg" py={10}>
