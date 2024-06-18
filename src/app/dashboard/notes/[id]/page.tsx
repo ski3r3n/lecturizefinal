@@ -1,4 +1,3 @@
-"use client";
 import { useEffect, useState } from "react";
 import {
   Box,
@@ -100,31 +99,26 @@ const NoteViewer = ({ params }: { params: { id: string } }) => {
     fetchUser();
   }, [id]);
 
-const generatePdf = async () => {
-  if (!note) return; // Ensure the note is loaded before generating the PDF
+  const generatePdf = async () => {
+    if (!note) return; // Ensure the note is loaded before generating the PDF
 
-  const response = await fetch('/api/md-to-pdf', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      title: note.title,
-      content: note.content,
-      subject: subjectFullNames[note.subject] || note.subject,
-      author: note.author.name,
-      createdAt: note.createdAt,
-    }),
-  });
+    const response = await fetch('/api/md-to-pdf', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        markdownContent: note.content, // Correct payload field name
+      }),
+    });
 
-  if (response.ok) {
-    const blob = await response.blob();
-    saveAs(blob, `${note.title}.pdf`);
-  } else {
-    console.error('Failed to generate PDF');
-  }
-};
-
+    if (response.ok) {
+      const blob = await response.blob();
+      saveAs(blob, `${note.title}.pdf`);
+    } else {
+      console.error('Failed to generate PDF');
+    }
+  };
 
   if (isLoading) {
     return (
