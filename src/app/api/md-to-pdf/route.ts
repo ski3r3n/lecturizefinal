@@ -4,14 +4,14 @@ import mdToPdf from 'md-to-pdf';
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'POST') {
     try {
-      const { markdownContent } = req.body;
+      const { content } = req.body;
 
-      if (!markdownContent) {
+      if (!content) {
         return res.status(400).json({ error: 'Markdown content is required' });
       }
 
       // Generate PDF from Markdown
-      const pdfBuffer = await mdToPdf({ content: markdownContent }).catch((error) => {
+      const pdfBuffer = await mdToPdf({ content }).catch((error) => {
         throw error;
       });
 
@@ -19,7 +19,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       res.setHeader('Content-Type', 'application/pdf');
       res.setHeader('Content-Disposition', 'attachment; filename="output.pdf"');
       res.send(pdfBuffer);
-
     } catch (error) {
       console.error('Error converting Markdown to PDF:', error);
       res.status(500).json({ error: 'Failed to convert Markdown to PDF' });
@@ -29,5 +28,3 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     res.status(405).end(`Method ${req.method} Not Allowed`);
   }
 }
-
-
