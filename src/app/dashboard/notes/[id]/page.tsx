@@ -97,7 +97,7 @@ const NoteViewer = ({ params }: { params: { id: string } }) => {
     if (!note) return; // Ensure the note is loaded before generating the PDF
 
     const doc = new jsPDF();
-    const lineHeight = 10;
+    const lineHeight = 8;
     let yOffset = 10;
 
     doc.setFontSize(20);
@@ -134,8 +134,6 @@ const NoteViewer = ({ params }: { params: { id: string } }) => {
         yOffset += lineHeight;
       } else {
         doc.setFontSize(12);
-
-        // Handle bold and italic text
         const parts = line.split(/(\*\*|\*)/g);
         let xOffset = 10;
 
