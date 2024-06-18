@@ -97,13 +97,45 @@ const NoteViewer = ({ params }: { params: { id: string } }) => {
     if (!note) return; // Ensure the note is loaded before generating the PDF
 
     const doc = new jsPDF();
+    const lineHeight = 10;
+    let yOffset = 10;
+
     doc.setFontSize(20);
-    doc.text(note.title, 10, 10);
+    doc.text(note.title, 10, yOffset);
+    yOffset += lineHeight;
+
     doc.setFontSize(12);
-    doc.text(`Subject: ${subjectFullNames[note.subject] || note.subject}`, 10, 20);
-    doc.text(`Author: ${note.author.name}`, 10, 30);
-    doc.text(`Posted on: ${new Date(note.createdAt).toLocaleDateString()}`, 10, 40);
-    doc.text(note.content, 10, 50);
+    doc.text(`Subject: ${subjectFullNames[note.subject] || note.subject}`, 10, yOffset);
+    yOffset += lineHeight;
+    doc.text(`Author: ${note.author.name}`, 10, yOffset);
+    yOffset += lineHeight;
+    doc.text(`Posted on: ${new Date(note.createdAt).toLocaleDateString()}`, 10, yOffset);
+    yOffset += lineHeight * 2;
+
+    const lines = note.content.split('\n');
+    doc.setFontSize(12);
+
+    lines.forEach((line) => {
+      if (line.startsWith('# ')) {
+        doc.setFontSize(18);
+        doc.text(line.substring(2), 10, yOffset);
+      } else if (line.startsWith('## ')) {
+        doc.setFontSize(16);
+        doc.text(line.substring(3), 10, yOffset);
+      } else if (line.startsWith('- ')) {
+        doc.setFontSize(12);
+        doc.text(`• ${line.substring(2)}`, 10, yOffset);
+      } else {
+        doc.setFontSize(12);
+        doc.text(line, 10, yOffset);
+      }
+      yOffset += lineHeight;
+
+      if (yOffset > doc.internal.pageSize.height - lineHeight) {
+        doc.addPage();
+        yOffset = 10;
+      }
+    });
 
     doc.save(`${note.title}.pdf`);
   };
