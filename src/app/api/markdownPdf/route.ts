@@ -10,7 +10,7 @@ interface PdfRequestBody {
   createdAt: string;
 }
 
-export async function POST(req: Request) {
+export async function POST(req: Request): Promise<Response> {
   try {
     // Parse the incoming request body
     const body: PdfRequestBody = await req.json();
@@ -31,29 +31,32 @@ ${body.content}
     `;
 
     // Create a new promise to handle the PDF generation asynchronously
-    return new Promise((resolve, reject) => {
+    const buffer = await new Promise<Buffer>((resolve, reject) => {
       markdownpdf().from.string(markdown).to.buffer((err, buffer) => {
         if (err) {
           // Handle any errors during PDF generation
           console.error("Error generating PDF:", err);
-          reject(new NextResponse(null, { status: 500, statusText: "Failed to generate PDF" }));
+          reject(err);
         } else {
-          // Create headers for the PDF response
-          const headers = new Headers({
-            "Content-Type": "application/pdf",
-            "Content-Disposition": `attachment; filename="${body.title}.pdf"`,
-            "Content-Length": buffer.length.toString(),
-          });
-
-          // Resolve the promise with the PDF buffer and headers
-          resolve(new NextResponse(buffer, { headers, status: 200 }));
+          // Resolve the promise with the PDF buffer
+          resolve(buffer);
         }
       });
     });
+
+    // Create headers for the PDF response
+    const headers = new Headers({
+      "Content-Type": "application/pdf",
+      "Content-Disposition": `attachment; filename="${body.title}.pdf"`,
+      "Content-Length": buffer.length.toString(),
+    });
+
+    // Return the PDF buffer as a response
+    return new Response(buffer, { headers, status: 200 });
   } catch (error) {
     // Handle any other errors
     console.error("Internal Server Error:", error);
-    return new NextResponse(null, { status: 500, statusText: "Internal Server Error" });
+    return new Response(null, { status: 500, statusText: "Internal Server Error" });
   }
 }
 
