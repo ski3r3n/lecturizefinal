@@ -1,3 +1,5 @@
+"use client";
+
 import { useEffect, useState } from "react";
 import {
   Box,
@@ -21,8 +23,6 @@ import { MdDownload, MdEdit } from "react-icons/md";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import Link from "next/link";
-import fs from "fs";
-import markdownpdf from "markdown-pdf";
 
 const subjectFullNames = {
   MA: "Mathematics",
@@ -73,6 +73,7 @@ const NoteViewer = ({ params }: { params: { id: string } }) => {
         console.error("Error fetching note:", error);
         setLoading(false);
       });
+
     const fetchUser = async () => {
       const response = await fetch("/api/userInfo", {
         method: "GET",
@@ -93,24 +94,29 @@ const NoteViewer = ({ params }: { params: { id: string } }) => {
     fetchUser();
   }, [id]);
 
-  const generatePdf = () => {
+  const generatePdf = async () => {
     if (!note) return; // Ensure the note is loaded before generating the PDF
 
-    const markdownContent = `
-# ${note.title}
-
-**Subject:** ${subjectFullNames[note.subject] || note.subject}
-**Author:** ${note.author.name}
-**Posted on:** ${new Date(note.createdAt).toLocaleDateString()}
-
-${note.content}
-    `;
-
-    fs.writeFileSync("note.md", markdownContent);
-    markdownpdf().from("note.md").to("note.pdf", function () {
-      console.log("PDF created successfully!");
-      fs.unlinkSync("note.md"); // Remove the temporary markdown file
+    const response = await fetch("/api/generate-pdf", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        title: note.title,
+        content: note.content,
+        subject: subjectFullNames[note.subject] || note.subject,
+        author: note.author.name,
+        createdAt: note.createdAt,
+      }),
     });
+
+    if (response.ok) {
+      const { url } = await response.json();
+      window.open(url, "_blank");
+    } else {
+      console.error("Failed to generate PDF");
+    }
   };
 
   if (isLoading) {
@@ -183,4 +189,3 @@ ${note.content}
 };
 
 export default NoteViewer;
-
