@@ -112,23 +112,26 @@ const generatePdf = async () => {
       }),
     });
 
-    if (response.ok) {
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.style.display = "none";
-      a.href = url;
-      a.download = `${note.title}.pdf`; // Set the file name here
-      document.body.appendChild(a);
-      a.click();
-      window.URL.revokeObjectURL(url);
-    } else {
+    if (!response.ok) {
       console.error("Failed to generate PDF");
+      return;
     }
+
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.style.display = "none";
+    a.href = url;
+    a.download = `${note.title}.pdf`; // Ensure a valid file name here
+    document.body.appendChild(a);
+    a.click();
+    window.URL.revokeObjectURL(url); // Release blob URL after download
   } catch (error) {
     console.error("Error generating PDF:", error);
   }
 };
+
 
   if (isLoading) {
     return (
