@@ -103,20 +103,25 @@ const NoteViewer = ({ params }: { params: { id: string } }) => {
 const generatePdf = async () => {
   if (!note) return; // Ensure the note is loaded before generating the PDF
 
-  const markdownContent = `
-# ${note.title}
+  const response = await fetch('/api/generate-pdf', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      title: note.title,
+      content: note.content,
+      subject: subjectFullNames[note.subject] || note.subject,
+      author: note.author.name,
+      createdAt: note.createdAt,
+    }),
+  });
 
-**Subject:** ${subjectFullNames[note.subject] || note.subject}  
-**Author:** ${note.author.name}  
-**Posted on:** ${new Date(note.createdAt).toLocaleDateString()}
-
-${note.content}
-  `;
-
-  const pdf = await toPdf({ content: markdownContent }).catch(console.error);
-
-  if (pdf) {
-    saveAs(new Blob([pdf.content], { type: "application/pdf" }), `${note.title}.pdf`);
+  if (response.ok) {
+    const blob = await response.blob();
+    saveAs(blob, `${note.title}.pdf`);
+  } else {
+    console.error('Failed to generate PDF');
   }
 };
 
