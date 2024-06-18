@@ -141,9 +141,9 @@ const NoteViewer = ({ params }: { params: { id: string } }) => {
 
         parts.forEach((part, index) => {
           if (part === '**') {
-            doc.setFontType(index % 2 === 1 ? 'bold' : 'normal');
+            doc.setFont(index % 2 === 1 ? 'bold' : 'normal');
           } else if (part === '*') {
-            doc.setFontType(index % 2 === 1 ? 'italic' : 'normal');
+            doc.setFont(index % 2 === 1 ? 'italic' : 'normal');
           } else {
             doc.text(part, xOffset, yOffset);
             xOffset += doc.getStringUnitWidth(part) * doc.internal.getFontSize();
