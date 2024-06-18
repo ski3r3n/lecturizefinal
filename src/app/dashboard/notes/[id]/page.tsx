@@ -119,17 +119,39 @@ const NoteViewer = ({ params }: { params: { id: string } }) => {
       if (line.startsWith('# ')) {
         doc.setFontSize(18);
         doc.text(line.substring(2), 10, yOffset);
+        yOffset += lineHeight;
       } else if (line.startsWith('## ')) {
         doc.setFontSize(16);
         doc.text(line.substring(3), 10, yOffset);
+        yOffset += lineHeight;
+      } else if (line.startsWith('### ')) {
+        doc.setFontSize(14);
+        doc.text(line.substring(4), 10, yOffset);
+        yOffset += lineHeight;
       } else if (line.startsWith('- ')) {
         doc.setFontSize(12);
         doc.text(`• ${line.substring(2)}`, 10, yOffset);
+        yOffset += lineHeight;
       } else {
         doc.setFontSize(12);
-        doc.text(line, 10, yOffset);
+
+        // Handle bold and italic text
+        const parts = line.split(/(\*\*|\*)/g);
+        let xOffset = 10;
+
+        parts.forEach((part, index) => {
+          if (part === '**') {
+            doc.setFontType(index % 2 === 1 ? 'bold' : 'normal');
+          } else if (part === '*') {
+            doc.setFontType(index % 2 === 1 ? 'italic' : 'normal');
+          } else {
+            doc.text(part, xOffset, yOffset);
+            xOffset += doc.getStringUnitWidth(part) * doc.internal.getFontSize();
+          }
+        });
+
+        yOffset += lineHeight;
       }
-      yOffset += lineHeight;
 
       if (yOffset > doc.internal.pageSize.height - lineHeight) {
         doc.addPage();
