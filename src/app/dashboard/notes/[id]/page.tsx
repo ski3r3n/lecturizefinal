@@ -135,20 +135,57 @@ const generatePdf = () => {
       renderMarkdown(line.substring(3), 16, 'bold'); // H2
     } else if (line.startsWith('### ')) {
       renderMarkdown(line.substring(4), 14, 'bold'); // H3
+    } else if (line.startsWith('#### ')) {
+      renderMarkdown(line.substring(5), 12, 'bold'); // H4
+    } else if (line.startsWith('##### ')) {
+      renderMarkdown(line.substring(6), 12, 'bold'); // H5
+    } else if (line.startsWith('###### ')) {
+      renderMarkdown(line.substring(7), 12, 'bold'); // H6
     } else if (line.startsWith('- ')) {
       renderMarkdown(`• ${line.substring(2)}`);
+    } else if (line.startsWith(':::')) {
+      renderMarkdown(`Note: ${line.substring(3).trim()}`);
     } else {
       // Handle inline Markdown for bold and italic
-      const parts = line.split(/(\*\*|\*)/g);
+      const parts = line.split(/(\*\*|\*|~~|<ins>|<\/ins>|<mark>|<\/mark>|\^|\+)/g);
       let isBold = false;
       let isItalic = false;
+      let isStrikethrough = false;
+      let isSubscript = false;
+      let isSuperscript = false;
+      let isInserted = false;
+      let isMarked = false;
+
       parts.forEach((part) => {
-        if (part === '**') {
-          isBold = !isBold;
-        } else if (part === '*') {
-          isItalic = !isItalic;
-        } else {
-          renderMarkdown(part, 12, `${isBold ? 'bold' : ''}${isItalic ? 'italic' : ''}`);
+        switch (part) {
+          case '**':
+            isBold = !isBold;
+            break;
+          case '*':
+            isItalic = !isItalic;
+            break;
+          case '~~':
+            isStrikethrough = !isStrikethrough;
+            break;
+          case '<ins>':
+          case '</ins>':
+            isInserted = !isInserted;
+            break;
+          case '<mark>':
+          case '</mark>':
+            isMarked = !isMarked;
+            break;
+          case '^':
+            isSuperscript = !isSuperscript;
+            break;
+          case '+':
+            isSubscript = !isSubscript;
+            break;
+          default:
+            let style = '';
+            if (isBold) style += 'bold';
+            if (isItalic) style += 'italic';
+            renderMarkdown(part, 12, style);
         }
       });
     }
@@ -156,6 +193,7 @@ const generatePdf = () => {
 
   doc.save(`${note.title}.pdf`);
 };
+
 
   if (isLoading) {
     return (
