@@ -22,7 +22,6 @@ import { MdDownload, MdEdit } from "react-icons/md";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import Link from "next/link";
-import { jsPDF } from "jspdf";
 import { saveAs } from 'file-saver';
 
 const subjectFullNames = {
