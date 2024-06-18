@@ -1,5 +1,4 @@
 "use client";
-
 import { useEffect, useState } from "react";
 import {
   Box,
@@ -23,6 +22,7 @@ import { MdDownload, MdEdit } from "react-icons/md";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import Link from "next/link";
+import { jsPDF } from "jspdf";
 
 const subjectFullNames = {
   MA: "Mathematics",
@@ -63,75 +63,109 @@ const NoteViewer = ({ params }: { params: { id: string } }) => {
   const [isLoading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch(`/api/notes/get/${id}`)
-      .then((res) => res.json())
-      .then((data) => {
+    const fetchNote = async () => {
+      try {
+        const res = await fetch(`/api/notes/get/${id}`);
+        const data = await res.json();
         setNote(data.note);
-        setLoading(false);
-      })
-      .catch((error) => {
+      } catch (error) {
         console.error("Error fetching note:", error);
+      } finally {
         setLoading(false);
-      });
-
-    const fetchUser = async () => {
-      const response = await fetch("/api/userInfo", {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include", // Ensure cookies are sent
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        console.log(data);
-        setUser(data);
-      } else {
-        console.error("Failed to fetch user data");
       }
     };
+
+    const fetchUser = async () => {
+      try {
+        const response = await fetch("/api/userInfo", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include", // Ensure cookies are sent
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setUser(data);
+        } else {
+          console.error("Failed to fetch user data");
+        }
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+      }
+    };
+
+    fetchNote();
     fetchUser();
   }, [id]);
 
-const generatePdf = async () => {
-  if (!note) return; // Ensure the note is loaded before generating the PDF
+  const generatePdf = () => {
+    if (!note) return; // Ensure the note is loaded before generating the PDF
 
-  try {
-    const response = await fetch("/api/generate-pdf", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        title: note.title,
-        content: note.content,
-        subject: subjectFullNames[note.subject] || note.subject,
-        author: note.author.name,
-        createdAt: note.createdAt,
-      }),
+    const doc = new jsPDF();
+    const lineHeight = 8;
+    let yOffset = 10;
+
+    doc.setFontSize(20);
+    doc.text(note.title, 10, yOffset);
+    yOffset += lineHeight;
+
+    doc.setFontSize(12);
+    doc.text(`Subject: ${subjectFullNames[note.subject] || note.subject}`, 10, yOffset);
+    yOffset += lineHeight;
+    doc.text(`Author: ${note.author.name}`, 10, yOffset);
+    yOffset += lineHeight;
+    doc.text(`Posted on: ${new Date(note.createdAt).toLocaleDateString()}`, 10, yOffset);
+    yOffset += lineHeight * 2;
+
+    const lines = note.content.split('\n');
+    doc.setFontSize(12);
+
+    lines.forEach((line) => {
+      if (line.startsWith('# ')) {
+        doc.setFontSize(18);
+        doc.text(line.substring(2), 10, yOffset);
+        yOffset += lineHeight;
+      } else if (line.startsWith('## ')) {
+        doc.setFontSize(16);
+        doc.text(line.substring(3), 10, yOffset);
+        yOffset += lineHeight;
+      } else if (line.startsWith('### ')) {
+        doc.setFontSize(14);
+        doc.text(line.substring(4), 10, yOffset);
+        yOffset += lineHeight;
+      } else if (line.startsWith('- ')) {
+        doc.setFontSize(12);
+        doc.text(`• ${line.substring(2)}`, 10, yOffset);
+        yOffset += lineHeight;
+      } else {
+        doc.setFontSize(12);
+        const parts = line.split(/(\*\*|\*)/g);
+        let xOffset = 10;
+
+        parts.forEach((part, index) => {
+          if (part === '**') {
+            doc.setFont(index % 2 === 1 ? 'bold' : 'normal');
+          } else if (part === '*') {
+            doc.setFont(index % 2 === 1 ? 'italic' : 'normal');
+          } else {
+            doc.text(part, xOffset, yOffset);
+            xOffset += doc.getStringUnitWidth(part) * doc.internal.getFontSize();
+          }
+        });
+
+        yOffset += lineHeight;
+      }
+
+      if (yOffset > doc.internal.pageSize.height - lineHeight) {
+        doc.addPage();
+        yOffset = 10;
+      }
     });
 
-    if (!response.ok) {
-      console.error("Failed to generate PDF");
-      return;
-    }
-
-    const blob = await response.blob();
-    const url = window.URL.createObjectURL(blob);
-
-    const a = document.createElement("a");
-    a.style.display = "none";
-    a.href = url;
-    a.download = `${note.title}.pdf`; // Ensure a valid file name here
-    document.body.appendChild(a);
-    a.click();
-    window.URL.revokeObjectURL(url); // Release blob URL after download
-  } catch (error) {
-    console.error("Error generating PDF:", error);
-  }
-};
-
+    doc.save(`${note.title}.pdf`);
+  };
 
   if (isLoading) {
     return (
