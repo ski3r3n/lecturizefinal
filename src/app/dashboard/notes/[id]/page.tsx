@@ -1,4 +1,3 @@
-"use client";
 import { useEffect, useState } from "react";
 import {
   Box,
@@ -22,7 +21,8 @@ import { MdDownload, MdEdit } from "react-icons/md";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import Link from "next/link";
-import { jsPDF } from "jspdf";
+import fs from "fs";
+import markdownpdf from "markdown-pdf";
 
 const subjectFullNames = {
   MA: "Mathematics",
@@ -93,107 +93,25 @@ const NoteViewer = ({ params }: { params: { id: string } }) => {
     fetchUser();
   }, [id]);
 
-const generatePdf = () => {
-  if (!note) return; // Ensure the note is loaded before generating the PDF
+  const generatePdf = () => {
+    if (!note) return; // Ensure the note is loaded before generating the PDF
 
-  const doc = new jsPDF();
-  const lineHeight = 10;
-  let yOffset = 20;
+    const markdownContent = `
+# ${note.title}
 
-  doc.setFontSize(20);
-  doc.text(note.title, 10, yOffset);
-  yOffset += lineHeight;
+**Subject:** ${subjectFullNames[note.subject] || note.subject}
+**Author:** ${note.author.name}
+**Posted on:** ${new Date(note.createdAt).toLocaleDateString()}
 
-  doc.setFontSize(12);
-  doc.text(`Subject: ${subjectFullNames[note.subject] || note.subject}`, 10, yOffset);
-  yOffset += lineHeight;
-  doc.text(`Author: ${note.author.name}`, 10, yOffset);
-  yOffset += lineHeight;
-  doc.text(`Posted on: ${new Date(note.createdAt).toLocaleDateString()}`, 10, yOffset);
-  yOffset += lineHeight * 2;
+${note.content}
+    `;
 
-  const renderMarkdown = (text, size = 12, fontStyle = 'normal') => {
-    doc.setFontSize(size);
-    doc.setFont('Helvetica', fontStyle);
-
-    const lines = doc.splitTextToSize(text, 180); // Split text to fit within the page width
-    lines.forEach((line) => {
-      if (yOffset + lineHeight > doc.internal.pageSize.height - 20) { // Check if a new page is needed
-        doc.addPage();
-        yOffset = 20;
-      }
-      doc.text(line, 10, yOffset);
-      yOffset += lineHeight;
+    fs.writeFileSync("note.md", markdownContent);
+    markdownpdf().from("note.md").to("note.pdf", function () {
+      console.log("PDF created successfully!");
+      fs.unlinkSync("note.md"); // Remove the temporary markdown file
     });
   };
-
-  const lines = note.content.split('\n');
-  lines.forEach((line) => {
-    if (line.startsWith('# ')) {
-      renderMarkdown(line.substring(2), 18, 'bold'); // H1
-    } else if (line.startsWith('## ')) {
-      renderMarkdown(line.substring(3), 16, 'bold'); // H2
-    } else if (line.startsWith('### ')) {
-      renderMarkdown(line.substring(4), 14, 'bold'); // H3
-    } else if (line.startsWith('#### ')) {
-      renderMarkdown(line.substring(5), 12, 'bold'); // H4
-    } else if (line.startsWith('##### ')) {
-      renderMarkdown(line.substring(6), 12, 'bold'); // H5
-    } else if (line.startsWith('###### ')) {
-      renderMarkdown(line.substring(7), 12, 'bold'); // H6
-    } else if (line.startsWith('- ')) {
-      renderMarkdown(`• ${line.substring(2)}`);
-    } else if (line.startsWith(':::')) {
-      renderMarkdown(`Note: ${line.substring(3).trim()}`);
-    } else {
-      // Handle inline Markdown for bold and italic
-      const parts = line.split(/(\*\*|\*|~~|<ins>|<\/ins>|<mark>|<\/mark>|\^|\+)/g);
-      let isBold = false;
-      let isItalic = false;
-      let isStrikethrough = false;
-      let isSubscript = false;
-      let isSuperscript = false;
-      let isInserted = false;
-      let isMarked = false;
-
-      parts.forEach((part) => {
-        switch (part) {
-          case '**':
-            isBold = !isBold;
-            break;
-          case '*':
-            isItalic = !isItalic;
-            break;
-          case '~~':
-            isStrikethrough = !isStrikethrough;
-            break;
-          case '<ins>':
-          case '</ins>':
-            isInserted = !isInserted;
-            break;
-          case '<mark>':
-          case '</mark>':
-            isMarked = !isMarked;
-            break;
-          case '^':
-            isSuperscript = !isSuperscript;
-            break;
-          case '+':
-            isSubscript = !isSubscript;
-            break;
-          default:
-            let style = '';
-            if (isBold) style += 'bold';
-            if (isItalic) style += 'italic';
-            renderMarkdown(part, 12, style);
-        }
-      });
-    }
-  });
-
-  doc.save(`${note.title}.pdf`);
-};
-
 
   if (isLoading) {
     return (
@@ -265,3 +183,4 @@ const generatePdf = () => {
 };
 
 export default NoteViewer;
+
