@@ -103,7 +103,7 @@ const NoteViewer = ({ params }: { params: { id: string } }) => {
 const generatePdf = async () => {
   if (!note) return; // Ensure the note is loaded before generating the PDF
 
-  const response = await fetch('/api/generate-pdf', {
+  const response = await fetch('/api/md-to-pdf', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
