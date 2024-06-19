@@ -1,3 +1,5 @@
+"use client";
+
 import { useEffect, useState } from "react";
 import {
   Box,
@@ -16,12 +18,44 @@ import {
   Skeleton,
   SkeletonCircle,
   SkeletonText,
+  Code,
+  Image,
+  ListItem,
+  OrderedList,
+  UnorderedList,
 } from "@chakra-ui/react";
 import { MdDownload, MdEdit } from "react-icons/md";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import Link from "next/link";
-import { saveAs } from 'file-saver';
+
+import "./styles.css"
+
+const renderers = {
+  paragraph: (props) => <Text mb={4} {...props} />,
+  heading: (props) => {
+    const sizes = ['2xl', 'xl', 'lg', 'md', 'sm', 'xs'];
+    return <Heading size={sizes[props.level - 1]} my={4} {...props} />;
+  },
+  link: (props) => <Link color="teal.500" isExternal {...props} />,
+  list: (props) =>
+    props.ordered ? (
+      <OrderedList spacing={2} {...props} />
+    ) : (
+      <UnorderedList spacing={2} {...props} />
+    ),
+  listItem: (props) => <ListItem {...props} />,
+  blockquote: (props) => (
+    <Box
+      pl={4}
+      py={2}
+      borderLeft="2px"
+      borderColor="gray.200"
+      {...props}
+    />
+  ),
+  image: (props) => <Image borderRadius="md" {...props} />,
+};
 
 const subjectFullNames = {
   MA: "Mathematics",
@@ -62,63 +96,75 @@ const NoteViewer = ({ params }: { params: { id: string } }) => {
   const [isLoading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchNote = async () => {
-      try {
-        const res = await fetch(`/api/notes/get/${id}`);
-        const data = await res.json();
+    fetch(`/api/notes/get/${id}`)
+      .then((res) => res.json())
+      .then((data) => {
         setNote(data.note);
-      } catch (error) {
-        console.error("Error fetching note:", error);
-      } finally {
         setLoading(false);
-      }
-    };
+      })
+      .catch((error) => {
+        console.error("Error fetching note:", error);
+        setLoading(false);
+      });
 
     const fetchUser = async () => {
-      try {
-        const response = await fetch("/api/userInfo", {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include", // Ensure cookies are sent
-        });
+      const response = await fetch("/api/userInfo", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include", // Ensure cookies are sent
+      });
 
-        if (response.ok) {
-          const data = await response.json();
-          setUser(data);
-        } else {
-          console.error("Failed to fetch user data");
-        }
-      } catch (error) {
-        console.error("Error fetching user data:", error);
+      if (response.ok) {
+        const data = await response.json();
+        console.log(data);
+        setUser(data);
+      } else {
+        console.error("Failed to fetch user data");
       }
     };
-
-    fetchNote();
     fetchUser();
   }, [id]);
 
-  const generatePdf = async () => {
-    if (!note) return; // Ensure the note is loaded before generating the PDF
+const generatePdf = async () => {
+  if (!note) return; // Ensure the note is loaded before generating the PDF
 
-    const response = await fetch('/api/md-to-pdf', {
-      method: 'POST',
+  try {
+    const response = await fetch("/api/generate-pdf", {
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        markdownContent: note.content, // Correct payload field name
+        title: note.title,
+        content: note.content,
+        subject: subjectFullNames[note.subject] || note.subject,
+        author: note.author.name,
+        createdAt: note.createdAt,
       }),
     });
 
-    if (response.ok) {
-      const blob = await response.blob();
-      saveAs(blob, `${note.title}.pdf`);
-    } else {
-      console.error('Failed to generate PDF');
+    if (!response.ok) {
+      console.error("Failed to generate PDF");
+      return;
     }
-  };
+
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.style.display = "none";
+    a.href = url;
+    a.download = `${note.title}.pdf`; // Ensure a valid file name here
+    document.body.appendChild(a);
+    a.click();
+    window.URL.revokeObjectURL(url); // Release blob URL after download
+  } catch (error) {
+    console.error("Error generating PDF:", error);
+  }
+};
+
 
   if (isLoading) {
     return (
@@ -172,7 +218,7 @@ const NoteViewer = ({ params }: { params: { id: string } }) => {
           </HStack>
         </HStack>
         <Divider />
-        <Text fontSize="lg" color={"gray.600"}>
+        <Text fontSize="lg" color={"gray.600"} className="markdown-body">
           <Markdown remarkPlugins={[remarkGfm]}>{note.content}</Markdown>
         </Text>
         <HStack justify="left" mt={4}>
