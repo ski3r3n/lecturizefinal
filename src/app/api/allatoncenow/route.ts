@@ -22,11 +22,6 @@ async function getHighestNoteId() {
   return highestNote ? highestNote.id : null; // Return the highest ID, or null if no notes exist
 }
 
-// const handleSaveMarkdown = (markdownContent, id) => {
-//     localStorage.setItem("markdownContent", markdownContent);
-//     localStorage.setItem("newNoteId", id);
-// };
-
 export const POST = async (req: NextRequest, res: any) => {
   const formData = await req.formData();
   const file = formData.get("file") as File;
@@ -49,7 +44,8 @@ export const POST = async (req: NextRequest, res: any) => {
       messages: [
         {
           role: "user",
-          content: `Summarize this lecture recording into concise, well-organized lecture notes in markdown format, short and simple, easily understood. ${transcription}`,
+          content: `Summarize this lecture into concise, bullet-pointed markdown notes suitable for high school revision, make it easy to skim through, remember, and revise, addressing the typical needs of a high school student preparing for exams or assessments. The following is the lecture transscription:
+          ${transcription}`,
         },
       ],
       model: "gpt-3.5-turbo-16k",
@@ -58,8 +54,6 @@ export const POST = async (req: NextRequest, res: any) => {
     const summary = gptResponse.choices[0].message.content;
     const highestId = await getHighestNoteId();
     const newNoteId = highestId ? highestId + 1 : 1;
-
-    // handleSaveMarkdown(summary, newNoteId);
 
     return NextResponse.json(
       { summary: summary, id: newNoteId },
