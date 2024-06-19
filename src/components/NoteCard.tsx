@@ -30,7 +30,9 @@ export default function NoteCard({
   subject,
   createdAt,
   author,
-  description
+  assignedClass,
+  description,
+  
 }) {
   // Formatting the createdAt date for display
   const formattedDate = new Date(createdAt).toLocaleDateString("en-US", {
@@ -79,9 +81,15 @@ export default function NoteCard({
             letterSpacing={1.1}>
             {subject}
           </Text> */}
+          <Box>
           <Badge variant="solid" colorScheme="green" w={"fit-content"} px={2}>
             {subject}
           </Badge>
+          <Badge variant="solid" colorScheme="purple" w={"fit-content"} px={2} ml={2}>
+            {assignedClass}
+          </Badge>
+          </Box>
+          
           <Link href={notesLink}>
             <Heading
               color={useColorModeValue("gray.700", "white")}

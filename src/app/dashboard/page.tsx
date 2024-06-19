@@ -29,6 +29,9 @@ interface Note {
   author: {
     name: string;
   };
+  class: {
+    name: string;
+  }
 }
 
 export default function Dashboard() {
@@ -111,7 +114,8 @@ export default function Dashboard() {
               id={note.id}
               title={note.title}
               content={note.content}
-              subject={subjectFullNames[note.subject] || note.subject}
+              subject={note.subject}
+              assignedClass={note.class.name}
               createdAt={note.createdAt}
               author={note.author}
               description={note.description}

@@ -31,26 +31,6 @@ import Link from "next/link";
 
 import "./styles.css";
 
-const renderers = {
-  paragraph: (props) => <Text mb={4} {...props} />,
-  heading: (props) => {
-    const sizes = ["2xl", "xl", "lg", "md", "sm", "xs"];
-    return <Heading size={sizes[props.level - 1]} my={4} {...props} />;
-  },
-  link: (props) => <Link color="teal.500" isExternal {...props} />,
-  list: (props) =>
-    props.ordered ? (
-      <OrderedList spacing={2} {...props} />
-    ) : (
-      <UnorderedList spacing={2} {...props} />
-    ),
-  listItem: (props) => <ListItem {...props} />,
-  blockquote: (props) => (
-    <Box pl={4} py={2} borderLeft="2px" borderColor="gray.200" {...props} />
-  ),
-  image: (props) => <Image borderRadius="md" {...props} />,
-};
-
 const subjectFullNames = {
   MA: "Mathematics",
   ELL: "English Language & Literature",
@@ -74,6 +54,9 @@ interface Note {
   updatedAt: string;
   author: {
     name: string;
+  };
+  class: {
+    name: string
   };
 }
 
@@ -180,6 +163,9 @@ const NoteViewer = ({ params }: { params: { id: string } }) => {
             </Heading>
             <Badge colorScheme="green" ml={4}>
               {subjectFullNames[note.subject] || note.subject}
+            </Badge>
+            <Badge colorScheme="purple" ml={0.5}>
+              {note.class.name}
             </Badge>
           </HStack>
           <HStack>
