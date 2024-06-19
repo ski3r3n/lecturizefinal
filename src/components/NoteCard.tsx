@@ -11,6 +11,7 @@ import {
   Avatar,
   useColorModeValue,
 } from "@chakra-ui/react";
+import { useLoading } from '@/app/hooks/LoadingContext';
 
 // Component accepts note details as props
 function truncateText(text, maxLength) {
@@ -32,7 +33,6 @@ export default function NoteCard({
   author,
   assignedClass,
   description,
-  
 }) {
   // Formatting the createdAt date for display
   const formattedDate = new Date(createdAt).toLocaleDateString("en-US", {
@@ -41,6 +41,7 @@ export default function NoteCard({
     day: "numeric",
   });
   const notesLink = `/dashboard/notes/${id}`;
+  const { setIsLoading } = useLoading();
 
   return (
     <Center py={6}>
@@ -62,6 +63,7 @@ export default function NoteCard({
             mx={-6}
             mb={6}
             pos={"relative"}
+            onClick={() => setIsLoading(true)}
           >
             <Image
               src={
@@ -96,6 +98,7 @@ export default function NoteCard({
               fontSize={"2xl"}
               fontFamily={"body"}
               my={2}
+              onClick={() => setIsLoading(true)}
             >
               {title} {/* Note title */}
             </Heading>

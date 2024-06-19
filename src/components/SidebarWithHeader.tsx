@@ -22,6 +22,7 @@ import {
   MenuItem,
   MenuList,
   Skeleton,
+  Progress,
 } from "@chakra-ui/react";
 import {
   FiHome,
@@ -37,6 +38,7 @@ import {
 } from "react-icons/fi";
 import { IconType } from "react-icons";
 import { useRouter } from "next/navigation";
+import { useLoading } from '@/app/hooks/LoadingContext';
 
 interface User {
   name: string;
@@ -77,7 +79,8 @@ const SidebarContent = ({
   const filteredLinkItems = LinkItems.filter(
     (link) => isTeacher || link.name !== "Record"
   );
-
+  const { setIsLoading } = useLoading();
+  
   return (
     <Box
       zIndex="2"
@@ -97,7 +100,7 @@ const SidebarContent = ({
         <CloseButton display={{ base: "flex", md: "none" }} onClick={onClose} />
       </Flex>
       {filteredLinkItems.map((link) => (
-        <NavItem key={link.name} icon={link.icon} link={link.link}>
+        <NavItem key={link.name} icon={link.icon} link={link.link} onClick={() => setIsLoading(true)}>
           {link.name}
         </NavItem>
       ))}
@@ -184,6 +187,7 @@ const MobileNav = ({ onOpen, ...rest }) => {
   };
 
   return (
+    <>
     <Flex
       zIndex="1" // Make sure zIndex is high enough to stay on top
       position="fixed" // Changed from sticky to fixed
@@ -260,12 +264,14 @@ const MobileNav = ({ onOpen, ...rest }) => {
         </Flex>
       </HStack>
     </Flex>
+    </>
   );
 };
 
 const SidebarWithHeader = ({ children }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [user, setUser] = useState<User | null>(null);
+  const { isLoading } = useLoading();
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -315,8 +321,12 @@ const SidebarWithHeader = ({ children }) => {
           </DrawerContent>
         </Drawer>
         <MobileNav onOpen={onOpen} />
-        <Box ml={{ base: 0, md: 60 }} mt={"80px"} p="4">
-          {children}
+        
+        <Box ml={{ base: 0, md: 60 }} mt={"80px"}>
+          {isLoading ? <Progress size='xs' isIndeterminate /> : ""}
+          <Box p="4">
+            {children}
+          </Box>
         </Box>
       </Box>
     </>

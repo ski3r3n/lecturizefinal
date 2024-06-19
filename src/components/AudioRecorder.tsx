@@ -150,7 +150,7 @@ function AudioRecorder() {
     const formData = new FormData();
     formData.append("file", audioFile);
 
-    fetch("/api/allatoncenow", {
+    fetch("/api/transform", {
       method: "POST",
       body: formData,
     })

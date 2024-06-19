@@ -1,7 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { Flex, Select, Box, Text, Grid, Divider } from "@chakra-ui/react";
-import SidebarWithHeader from "@/components/SidebarWithHeader";
+import { Flex, Select, Box, Text, Grid, Divider, Progress } from "@chakra-ui/react";
 import NoteCard from "@/components/NoteCard";
 import NoteCardSkeleton from "@/components/skeletons/NoteCardSkeleton";
 
@@ -79,6 +78,7 @@ export default function Dashboard() {
 
   return (
     <>
+      {/* <Progress size='xs' isIndeterminate /> */}
       <Box padding="4">
         <Text fontSize="lg" mb="4" fontWeight="bold">Manage Your Notes</Text>
         <Grid templateColumns={{ sm: "repeat(1, 1fr)", md: "repeat(2, 1fr)" }} gap={6}>
