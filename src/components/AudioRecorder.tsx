@@ -36,34 +36,6 @@ function AudioRecorder() {
   const saveButtonRef = useRef<HTMLButtonElement | null>(null);
   const router = useRouter();
 
-  // dropdown
-  const [classes, setClasses] = useState<Class[]>([]);
-  const [selectedClass, setSelectedClass] = useState("");
-  const [selectedSubject, setSelectedSubject] = useState("MA"); // Default to Mathematics
-  const subjectOptions = {
-    MA: "Mathematics",
-    ELL: "English Language & Literature",
-    TP: "Thinking Programme",
-    HC: "Higher Chinese",
-    PE: "Physical Education",
-    ACC: "Appreciation of Chinese Culture",
-    LSS: "Lower Secondary Science",
-    HI: "History",
-    GE: "Geography",
-    ART: "Art",
-    IF: "Infocomm",
-  };
-
-  useEffect(() => {
-    const fetchClasses = async () => {
-      const response = await fetch("/api/classes");
-      const data = await response.json();
-      setClasses(data);
-    };
-
-    fetchClasses();
-  }, []);
-
   useEffect(() => {
     let interval: NodeJS.Timeout | null = null;
     if (recording && !paused) {
@@ -168,8 +140,8 @@ function AudioRecorder() {
   };
 
   const uploadFile = async () => {
-    if (!audioFile || !selectedClass || !selectedSubject) {
-      console.error("All fields are required.");
+    if (!audioFile) {
+      console.error("Audio file missing!");
       return;
     }
 
@@ -177,8 +149,6 @@ function AudioRecorder() {
 
     const formData = new FormData();
     formData.append("file", audioFile);
-    formData.append("classId", selectedClass);
-    formData.append("subject", selectedSubject);
 
     fetch("/api/allatoncenow", {
       method: "POST",
@@ -276,37 +246,6 @@ function AudioRecorder() {
                 Save Recording
               </Button>
             )}
-
-            <FormControl isRequired>
-              <FormLabel htmlFor="class-select">Class</FormLabel>
-              <Select
-                id="class-select"
-                placeholder="Select a Class"
-                value={selectedClass}
-                onChange={(e) => setSelectedClass(e.target.value)}
-              >
-                {classes.map((cls) => (
-                  <option key={cls.id} value={cls.id}>
-                    {cls.name}
-                  </option>
-                ))}
-              </Select>
-            </FormControl>
-
-            <FormControl isRequired>
-              <FormLabel htmlFor="subject-select">Subject</FormLabel>
-              <Select
-                id="subject-select"
-                value={selectedSubject}
-                onChange={(e) => setSelectedSubject(e.target.value)}
-              >
-                {Object.entries(subjectOptions).map(([key, value]) => (
-                  <option key={key} value={key}>
-                    {value}
-                  </option>
-                ))}
-              </Select>
-            </FormControl>
           </>
         )}
         {/* Additional UI elements */}
