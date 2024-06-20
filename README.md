@@ -27,7 +27,7 @@ A platform that converts verbal teaching into concise, summarised revision notes
 
 ## Using Lecturize (website)
 
-- Visit [https://lecturizefinal.vercel.app/](https://lecturizefinal.vercel.app/)
+- Visit [https://lecturize.vercel.app/](https://lecturize.vercel.app/)
 
 ## Running the program locally
 
