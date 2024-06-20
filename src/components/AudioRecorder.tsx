@@ -23,9 +23,7 @@ interface Class {
 let autoclick = 0;
 
 function AudioRecorder() {
-  const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(
-    null
-  );
+  const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
   const [recording, setRecording] = useState(false);
   const [audioChunks, setAudioChunks] = useState<Blob[]>([]);
   const [paused, setPaused] = useState(false);
@@ -89,7 +87,7 @@ function AudioRecorder() {
         // Simulate click on the save button
         console.log(autoclick);
 
-        if (autoclick == 0) {
+        if (autoclick === 0) {
           autoclick = 1;
           setTimeout(function () {
             console.log(autoclick);
@@ -98,7 +96,7 @@ function AudioRecorder() {
           setTimeout(function () {
             saveButtonRef.current!.click();
           }, 200);
-        } else if (autoclick == 1) {
+        } else if (autoclick === 1) {
           autoclick = 0;
         }
       });
@@ -120,20 +118,12 @@ function AudioRecorder() {
       setPaused(true);
     }
   };
+
   const toggleRecording = () => {
     if (recording) {
-        mediaRecorder?.resume();
-        setPaused(false);
-        mediaRecorder?.stop(); // This will trigger 'stop' event and reset the state
+      mediaRecorder?.stop();
     } else {
       startRecording();
-    }
-  };
-
-  const pauseRecording = () => {
-    if (recording && !paused) {
-      mediaRecorder?.pause();
-      setPaused(true);
     }
   };
 
@@ -208,11 +198,10 @@ function AudioRecorder() {
               px="8"
               fontWeight="bold"
             >
-              {recording ? "Stop Recording"
-                : "Start Recording"}
+              {recording ? "Stop Recording" : "Start Recording"}
             </Button>
 
-            {recording ? (
+            {recording && (
               <Button
                 onClick={togglePause}
                 colorScheme="blue"
@@ -221,8 +210,7 @@ function AudioRecorder() {
                 fontWeight="bold"
                 mr="2"
               >
-              {paused ? "Resume"
-                  : "Pause"}
+                {paused ? "Resume" : "Pause"}
               </Button>
             )}
 
@@ -252,7 +240,6 @@ function AudioRecorder() {
             )}
           </>
         )}
-        {/* Additional UI elements */}
       </VStack>
     </Center>
   );
