@@ -111,14 +111,20 @@ function AudioRecorder() {
     }
   };
 
+  const togglePause = () => {
+    if (paused) {
+      mediaRecorder?.resume();
+      setPaused(false);
+    } else {
+      mediaRecorder?.pause();
+      setPaused(true);
+    }
+
   const toggleRecording = () => {
     if (recording) {
-      if (paused) {
         mediaRecorder?.resume();
         setPaused(false);
-      } else {
         mediaRecorder?.stop(); // This will trigger 'stop' event and reset the state
-      }
     } else {
       startRecording();
     }
@@ -202,23 +208,21 @@ function AudioRecorder() {
               px="8"
               fontWeight="bold"
             >
-              {recording
-                ? paused
-                  ? "Resume Recording"
-                  : "Stop Recording"
+              {recording ? "Stop Recording"
                 : "Start Recording"}
             </Button>
 
-            {recording && !paused && (
+            {recording ? (
               <Button
-                onClick={pauseRecording}
+                onClick={togglePause}
                 colorScheme="blue"
                 size="md"
                 borderRadius="md"
                 fontWeight="bold"
                 mr="2"
               >
-                Pause
+              {paused ? "Resume"
+                  : "Pause"}
               </Button>
             )}
 
