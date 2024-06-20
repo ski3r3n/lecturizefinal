@@ -119,7 +119,7 @@ function AudioRecorder() {
       mediaRecorder?.pause();
       setPaused(true);
     }
-
+  };
   const toggleRecording = () => {
     if (recording) {
         mediaRecorder?.resume();
