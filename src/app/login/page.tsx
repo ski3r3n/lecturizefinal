@@ -24,10 +24,12 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter()
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    setIsLoading(true);
     const response = await fetch('/api/auth/login', {
       method: 'POST',
       headers: {
@@ -41,6 +43,7 @@ export default function Login() {
     } else {
       alert('Invalid credentials');
     }
+    setIsLoading(false);
   };
 
   return (
@@ -49,15 +52,15 @@ export default function Login() {
       align={"center"}
       justify={"center"}
       bg={useColorModeValue("gray.50", "gray.800")}
-    >1
+    >
       <Stack spacing={8} mx={"auto"} maxW={"lg"} py={12} px={6}>
         <Stack align={"center"}>
           <Heading fontSize={"4xl"} textAlign={"center"}>
             Sign in
           </Heading>
-          <Text fontSize={"lg"} color={"gray.600"}>
+          {/* <Text fontSize={"lg"} color={"gray.600"}>
             to Lecturise
-          </Text>
+          </Text> */}
         </Stack>
         <Box
           rounded={"lg"}
@@ -66,9 +69,6 @@ export default function Login() {
           p={8}
         >
           <Stack spacing={4}>
-            <HStack>
-              <Box></Box>
-            </HStack>
             <FormControl id="email" isRequired>
               <FormLabel>Email address</FormLabel>
               <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
@@ -90,21 +90,20 @@ export default function Login() {
               </InputGroup>
             </FormControl>
             <Stack spacing={10} pt={2}>
-              <Link href="dashboard" width="100%">
-                <Button
-                  width="100%"
-                  loadingText="Submitting"
-                  size="lg"
-                  bg={"blue.400"}
-                  color={"white"}
-                  _hover={{
-                    bg: "blue.500",
-                  }}
-                  onClick={handleSubmit}
-                >
-                  Log In
-                </Button>
-              </Link>
+              <Button
+                width="100%"
+                isLoading={isLoading}
+                loadingText="Submitting"
+                size="lg"
+                bg={"blue.400"}
+                color={"white"}
+                _hover={{
+                  bg: "blue.500",
+                }}
+                onClick={handleSubmit}
+              >
+                Log In
+              </Button>
             </Stack>
             <Stack pt={6}></Stack>
           </Stack>

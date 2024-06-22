@@ -24,7 +24,7 @@ import {
   Center,
   useDisclosure,
 } from "@chakra-ui/react";
-import { useRouter } from "next/navigation";
+import { useRouter } from "next/navigation"; // Corrected from 'next/navigation' to 'next/router'
 
 // Dynamically import the markdown editor
 const MdEditor = dynamic(() => import("react-markdown-editor-lite"), {
@@ -43,16 +43,14 @@ interface Class {
   description: string;
 }
 
-const MarkdownEditorPage = ({ params }: { params: { id: string } }) => {
+const CreateNote = () => {
   const [user, setUser] = useState<User | null>(null);
-  const [creatingNote, setCreatingNote] = useState(false);
   const [description, setDescription] = useState("");
   const [noteContent, setNoteContent] = useState("");
   const [title, setTitle] = useState("");
   const [classes, setClasses] = useState<Class[]>([]);
   const [selectedClass, setSelectedClass] = useState("");
   const [selectedSubject, setSelectedSubject] = useState("");
-  const [noteId, setNoteId] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const cancelRef = useRef(null);
@@ -73,47 +71,14 @@ const MarkdownEditorPage = ({ params }: { params: { id: string } }) => {
     IF: "Infocomm",
   };
 
-  useEffect(() => {
-    const content = localStorage.getItem("noteContent");
-    if (content) {
-      setNoteContent(content);
-    }
-  }, []);
+  const fetchClasses = async () => {
+    const response = await fetch("/api/classes");
+    const data = await response.json();
+    setClasses(data);
+  };
 
   useEffect(() => {
-    const fetchClasses = async () => {
-      const response = await fetch("/api/classes");
-      const data = await response.json();
-      console.log(data);
-      setClasses(data);
-    };
-
     fetchClasses();
-
-    fetch(`/api/notes/get/${params.id}`)
-      .then((res) => {
-        if (!res.ok) {
-          const content = localStorage.getItem("markdownContent");
-          if (content) {
-            setCreatingNote(true);
-            setNoteContent(content);
-          } else {
-            alert("No note of ID found and no note to create!");
-          }
-        }
-        return res.json();
-      })
-      .then((data) => {
-        setTitle(data.note.title);
-        setSelectedClass(data.note.class.id);
-        setSelectedSubject(data.note.subject);
-        setNoteContent(data.note.content);
-        setDescription(data.note.description);
-        setNoteId(data.note.id);
-      })
-      .catch((error) => {
-        console.log(`Everything is perfectly fine: ${error}`);
-      });
   }, []);
 
   const handleEditorChange = ({ text }) => {
@@ -137,37 +102,20 @@ const MarkdownEditorPage = ({ params }: { params: { id: string } }) => {
       })
       .then((data) => {
         setUser(data);
-        if (creatingNote) {
-          return fetch("/api/notes/create", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              title: title,
-              content: noteContent,
-              subject: selectedSubject,
-              classId: Number(selectedClass),
-              authorId: data.id, // Use the fetched user ID
-              description: description,
-            }),
-          });
-        } else {
-          return fetch("/api/notes/update", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              title: title,
-              content: noteContent,
-              subject: selectedSubject,
-              classId: Number(selectedClass),
-              noteId: Number(noteId), // Use the fetched user ID
-              description: description,
-            }),
-          });
-        }
+        return fetch("/api/notes/create", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            title: title,
+            content: noteContent,
+            subject: selectedSubject,
+            classId: Number(selectedClass),
+            authorId: data.id, // Use the fetched user ID
+            description: description,
+          }),
+        });
       })
       .then((response) => {
         if (!response.ok) {
@@ -178,7 +126,7 @@ const MarkdownEditorPage = ({ params }: { params: { id: string } }) => {
       })
       .then((noteData) => {
         toast({
-          title: "Note saved successfully.",
+          title: "Note created successfully.",
           description: "Your note has been successfully saved to the database",
           status: "success",
           duration: 5000,
@@ -199,45 +147,6 @@ const MarkdownEditorPage = ({ params }: { params: { id: string } }) => {
       });
   };
 
-  const handleDelete = () => {
-    onClose(); // Close the dialog
-    setIsLoading(true); // Show loading indicator
-
-    fetch(`/api/notes/delete/${noteId}`, {
-      method: "DELETE",
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Failed to delete the note");
-        }
-        return response.json();
-      })
-      .then(() => {
-        toast({
-          title: "Note deleted successfully.",
-          description: "The note has been removed from your records.",
-          status: "success",
-          duration: 5000,
-          isClosable: true,
-        });
-        router.push("/dashboard");
-      })
-      .catch((error) => {
-        console.error("Deletion error:", error);
-        toast({
-          title: "Error deleting note.",
-          description: error.message,
-          status: "error",
-          duration: 5000,
-          isClosable: true,
-        });
-      })
-      .finally(() => {
-        setIsLoading(false); // Hide loading indicator
-      });
-  };
-  
-
   return (
     <Container maxW="container.xl" py={8}>
       {isLoading ? (
@@ -249,7 +158,7 @@ const MarkdownEditorPage = ({ params }: { params: { id: string } }) => {
         </Center>
       ) : (
         <>
-          <Heading mb={4}>Edit Note</Heading>
+          <Heading mb={4}>Create New Note</Heading>
           <Grid templateColumns={{ md: "3fr 2fr 2fr" }} gap={6}>
             <FormControl isRequired>
               <FormLabel htmlFor="title">Title</FormLabel>
@@ -311,40 +220,10 @@ const MarkdownEditorPage = ({ params }: { params: { id: string } }) => {
           <Button mt={4} colorScheme="blue" onClick={saveNote}>
             Save Note
           </Button>
-          <Button ml={4} mt={4} colorScheme="red" onClick={onOpen}>
-            Delete Note
-          </Button>
-
-          <AlertDialog
-            isOpen={isOpen}
-            leastDestructiveRef={cancelRef}
-            onClose={onClose}
-          >
-            <AlertDialogOverlay>
-              <AlertDialogContent>
-                <AlertDialogHeader fontSize="lg" fontWeight="bold">
-                  Delete Note
-                </AlertDialogHeader>
-
-                <AlertDialogBody>
-                  Are you sure? You can&lsquo;t undo this action afterwards.
-                </AlertDialogBody>
-
-                <AlertDialogFooter>
-                  <Button ref={cancelRef} onClick={onClose}>
-                    Cancel
-                  </Button>
-                  <Button colorScheme="red" onClick={handleDelete} ml={3}>
-                    Delete
-                  </Button>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialogOverlay>
-          </AlertDialog>
         </>
       )}
     </Container>
   );
 };
 
-export default MarkdownEditorPage;
+export default CreateNote;

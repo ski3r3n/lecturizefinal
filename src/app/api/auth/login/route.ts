@@ -16,7 +16,7 @@ export async function POST(req: Request) {
     if (user && password === user.password) {
       // Generate JWT token
       const token = jwt.sign(
-        { userId: user.id }, // Payload
+        { userId: user.id, userRole: user.role }, // Payload
         JWT_SECRET,
         { expiresIn: '365d' } // Token expiry time, adjust as needed
       );
