@@ -39,6 +39,7 @@ export default function Dashboard() {
   const [sortOrder, setSortOrder] = useState<string>("newest");
   const [filterSubject, setFilterSubject] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [filterClass, setFilterClass] = useState<string>("");
 
   useEffect(() => {
     async function fetchNotes() {
@@ -58,7 +59,8 @@ export default function Dashboard() {
 
   useEffect(() => {
     let sortedFilteredNotes = notes.filter((note) =>
-      filterSubject ? note.subject === filterSubject : true
+      (filterSubject ? note.subject === filterSubject : true) &&
+      (filterClass ? note.class.name === filterClass : true)
     );
 
     sortedFilteredNotes.sort((a, b) => {
@@ -90,6 +92,16 @@ export default function Dashboard() {
             <option value="newest">Newest First</option>
             <option value="oldest">Oldest First</option>
           </Select>
+          <Select
+            placeholder="Filter by Class"
+            onChange={(e) => setFilterClass(e.target.value)}
+            shadow="base"
+          >
+            <option value="" key="">All Classes</option>
+            <option value="2A3" key="2A3">2A3</option>
+            <option value="2A2" key="2A2">2A2</option>
+          </Select>
+
           <Select
             placeholder="Filter by Subject"
             onChange={(e) => setFilterSubject(e.target.value)}
