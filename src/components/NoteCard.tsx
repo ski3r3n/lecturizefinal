@@ -13,17 +13,15 @@ import {
 } from "@chakra-ui/react";
 import { useLoading } from '@/app/hooks/LoadingContext';
 
-// Component accepts note details as props
+// Function to truncate text
 function truncateText(text, maxLength) {
-  // Check if the text length is greater than the maxLength,
-  // if it is, truncate the string to the maxLength and append '...'
   if (text.length > maxLength) {
     return text.substring(0, maxLength) + "...";
   }
-  // If the text length is within the limit, return the text as it is.
   return text;
 }
 
+// NoteCard Component
 export default function NoteCard({
   id,
   title,
@@ -34,7 +32,6 @@ export default function NoteCard({
   assignedClass,
   description,
 }) {
-  // Formatting the createdAt date for display
   const formattedDate = new Date(createdAt).toLocaleDateString("en-US", {
     year: "numeric",
     month: "long",
@@ -54,6 +51,8 @@ export default function NoteCard({
         rounded={"md"}
         p={6}
         overflow={"hidden"}
+        transition="transform 0.3s ease-in-out"
+        _hover={{ transform: "scale(1.05)" }}
       >
         <Link href={notesLink}>
           <Box
@@ -75,23 +74,14 @@ export default function NoteCard({
           </Box>
         </Link>
         <Stack>
-          {/* <Text
-            color={'green.500'}
-            textTransform={'uppercase'}
-            fontWeight={800}
-            fontSize={'sm'}
-            letterSpacing={1.1}>
-            {subject}
-          </Text> */}
           <Box>
-          <Badge variant="solid" colorScheme="green" w={"fit-content"} px={2}>
-            {subject}
-          </Badge>
-          <Badge variant="solid" colorScheme="purple" w={"fit-content"} px={2} ml={2}>
-            {assignedClass}
-          </Badge>
+            <Badge variant="solid" colorScheme="green" w={"fit-content"} px={2}>
+              {subject}
+            </Badge>
+            <Badge variant="solid" colorScheme="purple" w={"fit-content"} px={2} ml={2}>
+              {assignedClass}
+            </Badge>
           </Box>
-          
           <Link href={notesLink}>
             <Heading
               color={useColorModeValue("gray.700", "white")}
@@ -103,7 +93,6 @@ export default function NoteCard({
               {title} {/* Note title */}
             </Heading>
           </Link>
-
           <Text color={"gray.500"}>
             {truncateText(description, 90)} {/* Short preview or full content */}
           </Text>
