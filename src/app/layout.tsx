@@ -3,7 +3,6 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
 import { ChakraProvider } from "@chakra-ui/react";
-import { CookiesProvider } from "next-client-cookies/server";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -21,9 +20,7 @@ export default function RootLayout({
   return (
     <html lang="en-GB">
       <body className="bg[#f3f5f8]">
-        <CookiesProvider>
-          <Providers>{children}</Providers>
-        </CookiesProvider>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

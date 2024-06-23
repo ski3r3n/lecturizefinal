@@ -28,6 +28,7 @@ import { useLoading } from "@/app/hooks/LoadingContext";
 import { useRouter } from "next/navigation";
 import { Image } from "@chakra-ui/react";
 import Link from "next/link";
+import Logo from "@/components/logo"
 
 interface Props {
   children: React.ReactNode;
@@ -64,12 +65,11 @@ const NavLink = ({ children, link, ...rest }: NavLinkProps) => {
   );
 };
 
-export default function NewNavbar({ children }) {
+export default function NewNavbar(props) {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { isLoading, setIsLoading } = useLoading();
   const router = useRouter();
   const toast = useToast();
-  console.log(isLoading);
 
   // Ensure the object structure with type assertion
   const { user, userIsLoading } = (useUser() || {
@@ -126,11 +126,15 @@ export default function NewNavbar({ children }) {
           <HStack spacing={8} alignItems={"center"}>
             <Box>
               <Link href="/dashboard">
-                <Image
+                {/* <Image
                   boxSize="35px"
-                  src="/assets/logo.png"
+                  src="/assets/img/logo/lecturize-svg.svg"
                   alt="Lecturize Logo"
-                />
+                /> */}
+                <Box>
+                  <Logo height="25px" />
+                </Box>
+                
               </Link>
             </Box>
             <HStack
@@ -220,8 +224,8 @@ export default function NewNavbar({ children }) {
       </Box>
       <Box mt={"64px"}>
         {isLoading ? <Progress size="xs" isIndeterminate /> : ""}
-        <Box p={4}>{children}</Box>
       </Box>
+      
     </>
   );
 }
