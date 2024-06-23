@@ -1,52 +1,73 @@
 "use client";
 
-import { ChakraProvider, Box, Progress } from "@chakra-ui/react";
-import { useLoading, LoadingProvider } from "@/app/hooks/LoadingContext"; // Ensure path is correct
+import { ChakraProvider, extendTheme, Box } from "@chakra-ui/react";
+import { useLoading, LoadingProvider } from "@/app/hooks/LoadingContext";
 import { usePathname } from "next/navigation";
 import { Suspense } from "react";
-import { NavigationEvents } from "@/app/utils/NavigationEvents"; // Ensure path is correct
+import { NavigationEvents } from "@/app/utils/NavigationEvents";
 import { UserProvider } from "@/app/hooks/UserContext";
 import NewNavbar from "@/components/NewNavbar";
 import Footer from "@/components/Footer";
+import { theme } from "@/app/theme";
+
+function DashboardLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <UserProvider>
+      <Box
+        zIndex="1"
+        display="flex"
+        flexDir="column"
+        position="relative"
+        minHeight="100vh"
+        width="100%"
+        bgColor="#f3f5f8"
+      >
+        <NewNavbar />
+        <Box flex="1" p={4} pb={"30px"} overflowY="auto">
+          {children}
+        </Box>
+        <Footer />
+        <Suspense fallback={<div>Loading...</div>}>
+          <NavigationEvents />
+        </Suspense>
+      </Box>
+    </UserProvider>
+  );
+}
+
+function DefaultLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <>
+      <Box flex="1" overflowX="hidden">
+        {children}
+      </Box>
+      <Footer />
+    </>
+  );
+}
 
 export function Providers({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { isLoading } = useLoading();
   console.log(isLoading);
 
-  // Check if the current pathname starts with /dashboard
   const isDashboard = pathname.startsWith("/dashboard");
 
   return (
-    <ChakraProvider>
+    <ChakraProvider theme={theme}>
       <LoadingProvider>
-        {isDashboard ? (
-          <UserProvider>
-            <Box
-              zIndex="1"
-              display="flex"
-              flexDir="column"
-              position="fixed"
-              height="100vh"
-              width="100vw"
-              overflow="scroll"
-              bgColor="#f3f5f8"
-            >
-              <NewNavbar />
-              <Box p={4}>{children}</Box>
-              <Footer />
-
-              <Suspense fallback={<div>Loading...</div>}>
-                <NavigationEvents />
-              </Suspense>
-            </Box>
-          </UserProvider>
-        ) : (
-          <>
-            {children}
-            <Footer />
-          </>
-        )}
+        <Box
+          display="flex"
+          flexDirection="column"
+          minHeight="100vh"
+          width="100%"
+        >
+          {isDashboard ? (
+            <DashboardLayout children={children} />
+          ) : (
+            <DefaultLayout children={children} />
+          )}
+        </Box>
       </LoadingProvider>
     </ChakraProvider>
   );

@@ -1,10 +1,7 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
-import "./globals.css";
+// import "./globals.css";
 import { Providers } from "./providers";
-import { ChakraProvider } from "@chakra-ui/react";
-
-const inter = Inter({ subsets: ["latin"] });
+import { fonts } from './fonts'
 
 export const metadata: Metadata = {
   title: "Lecturize",
@@ -18,7 +15,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en-GB">
+    <html lang="en-GB" className={fonts.NotoSans.variable}>
       <body className="bg[#f3f5f8]">
         <Providers>{children}</Providers>
       </body>

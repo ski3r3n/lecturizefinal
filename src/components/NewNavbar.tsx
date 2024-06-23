@@ -22,13 +22,11 @@ import {
 } from "@chakra-ui/react";
 import { HamburgerIcon, CloseIcon, AddIcon, EditIcon } from "@chakra-ui/icons";
 import { GrMicrophone } from "react-icons/gr";
-import { useCookies } from "next-client-cookies";
 import { useUser } from "@/app/hooks/UserContext";
 import { useLoading } from "@/app/hooks/LoadingContext";
 import { useRouter } from "next/navigation";
-import { Image } from "@chakra-ui/react";
 import Link from "next/link";
-import Logo from "@/components/logo"
+import Logo from "@/components/logo";
 
 interface Props {
   children: React.ReactNode;
@@ -44,7 +42,6 @@ interface NavLinkProps extends FlexProps {
   link: string;
 }
 
-// const Links = ["Dashboard", "Projects", "Team"];
 const LinkItems: Array<LinkItemProps> = [{ name: "Notes", link: "/dashboard" }];
 
 const NavLink = ({ children, link, ...rest }: NavLinkProps) => {
@@ -71,7 +68,6 @@ export default function NewNavbar(props) {
   const router = useRouter();
   const toast = useToast();
 
-  // Ensure the object structure with type assertion
   const { user, userIsLoading } = (useUser() || {
     user: null,
     userIsLoading: false,
@@ -108,11 +104,11 @@ export default function NewNavbar(props) {
       <Box
         bg={useColorModeValue("gray.100", "gray.900")}
         px={4}
-        position="fixed" // Added fixed position
-        top={0} // Stick to the top
-        left={0} // Align to the left
-        right={0} // Stretch across the right
-        zIndex={1} // Ensure it stays on top of other content
+        position="fixed"
+        top={0}
+        left={0}
+        right={0}
+        zIndex={1}
         width="full"
       >
         <Flex h={16} alignItems={"center"} justifyContent={"space-between"}>
@@ -126,15 +122,9 @@ export default function NewNavbar(props) {
           <HStack spacing={8} alignItems={"center"}>
             <Box>
               <Link href="/dashboard">
-                {/* <Image
-                  boxSize="35px"
-                  src="/assets/img/logo/lecturize-svg.svg"
-                  alt="Lecturize Logo"
-                /> */}
                 <Box>
                   <Logo height="25px" />
                 </Box>
-                
               </Link>
             </Box>
             <HStack
@@ -200,6 +190,15 @@ export default function NewNavbar(props) {
                 <Avatar size={"sm"} name={user ? user.name : ""} />
               </MenuButton>
               <MenuList>
+                <Box px={4} py={2}>
+                  <Text fontWeight="bold" fontSize="md">
+                    {user ? user.name : "Guest"}
+                  </Text>
+                  <Text fontSize="sm">
+                    {user ? user.email : "No email available"}
+                  </Text>
+                </Box>
+                <MenuDivider />
                 <MenuItem onClick={handleLogout}>Sign Out</MenuItem>
               </MenuList>
             </Menu>
@@ -225,7 +224,6 @@ export default function NewNavbar(props) {
       <Box mt={"64px"}>
         {isLoading ? <Progress size="xs" isIndeterminate /> : ""}
       </Box>
-      
     </>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { Flex, Select, Box, Text, Grid, Divider, Progress } from "@chakra-ui/react";
+import { Heading, Flex, Select, Box, Text, Grid, Divider, Progress } from "@chakra-ui/react";
 import NoteCard from "@/components/NoteCard";
 import NoteCardSkeleton from "@/components/skeletons/NoteCardSkeleton";
 
@@ -33,6 +33,11 @@ interface Note {
   }
 }
 
+interface Class {
+  id: number;
+  name: string;
+}
+
 export default function Dashboard() {
   const [notes, setNotes] = useState<Note[]>([]);
   const [filteredNotes, setFilteredNotes] = useState<Note[]>([]);
@@ -40,6 +45,7 @@ export default function Dashboard() {
   const [filterSubject, setFilterSubject] = useState<string>("");
   const [filterClass, setFilterClass] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [classes, setClasses] = useState<Class[]>([]);
 
   useEffect(() => {
     async function fetchNotes() {
@@ -54,7 +60,17 @@ export default function Dashboard() {
       }
     }
 
+    async function fetchClasses() {
+      const response = await fetch("/api/classes");
+      if (response.ok) {
+        const data = await response.json();
+        setClasses(data);
+        console.log(data)
+      }
+    }
+
     fetchNotes();
+    fetchClasses();
   }, []);
 
   useEffect(() => {
@@ -79,9 +95,8 @@ export default function Dashboard() {
 
   return (
     <>
-      {/* <Progress size='xs' isIndeterminate /> */}
       <Box padding="4">
-        <Text fontSize="lg" mb="4" fontWeight="bold">Manage Your Notes</Text>
+        <Heading as="h1" size="md" mb="4" fontWeight="bold">Manage Your Notes</Heading>
         <Grid templateColumns={{ sm: "repeat(1, 1fr)", md: "repeat(3, 1fr)" }} gap={6}>
           <Select
             placeholder="Sort by"
@@ -107,8 +122,9 @@ export default function Dashboard() {
             shadow="base"
           >
             <option value="" key="">All Classes</option>
-            <option value="2A3" key="2A3">2A3</option>
-            <option value="2A2" key="2A2">2A2</option>
+            {classes.map((classItem) => (
+              <option value={classItem.id} key={classItem.id}>{classItem.name}</option>
+            ))}
           </Select>
         </Grid>
       </Box>
