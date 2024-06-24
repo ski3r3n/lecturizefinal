@@ -14,6 +14,7 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  
   return (
     <html lang="en-GB" className={fonts.NotoSans.variable}>
       <body className="bg[#f3f5f8]">
