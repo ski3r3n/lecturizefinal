@@ -12,7 +12,6 @@ export function NavigationEvents() {
   useEffect(() => {
     setIsLoading(true); // Start loading on route change
     const url = `${pathname}?${searchParams}`;
-    console.log('Navigating to URL:', url);
 
     // Simulate loading process (can adjust logic as needed)
     setTimeout(() => {

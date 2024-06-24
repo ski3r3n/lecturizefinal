@@ -84,13 +84,9 @@ function AudioRecorder() {
         setPaused(false);
         setTimer(0); // Reset timer
 
-        // Simulate click on the save button
-        console.log(autoclick);
-
         if (autoclick === 0) {
           autoclick = 1;
           setTimeout(function () {
-            console.log(autoclick);
             saveButtonRef.current!.click();
           }, 100);
           setTimeout(function () {
@@ -157,7 +153,6 @@ function AudioRecorder() {
         return response.json();
       })
       .then((data) => {
-        console.log(data);
         localStorage.setItem("markdownContent", data.summary);
         localStorage.setItem("newNoteId", data.id);
         setIsLoading(false); // Update loading state
@@ -172,8 +167,6 @@ function AudioRecorder() {
   const recordingColor = useColorModeValue("#e74c3c", "#ff0000");
   const pauseColor = useColorModeValue("#3498db", "#2980b9");
   const saveColor = useColorModeValue("#2ecc71", "#27ae60");
-
-  console.log(isLoading);
 
   return (
     <Center mt="50px">

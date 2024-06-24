@@ -49,7 +49,6 @@ function DefaultLayout({ children }: { children: React.ReactNode }) {
 export function Providers({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { isLoading } = useLoading();
-  console.log(isLoading);
 
   const isDashboard = pathname.startsWith("/dashboard");
 

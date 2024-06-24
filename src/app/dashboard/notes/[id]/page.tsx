@@ -91,7 +91,6 @@ const NoteViewer = ({ params }: { params: { id: string } }) => {
 
       if (response.ok) {
         const data = await response.json();
-        console.log(data);
         setUser(data);
       } else {
         console.error("Failed to fetch user data");

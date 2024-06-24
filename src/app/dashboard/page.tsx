@@ -90,7 +90,6 @@ export default function Dashboard() {
       if (response.ok) {
         const data = await response.json();
         setClasses(data);
-        console.log(data)
       }
     }
 
@@ -99,7 +98,6 @@ export default function Dashboard() {
       if (response.ok) {
         const data = await response.json();
         setSubjects(data);
-        console.log(data)
       }
     }
 
