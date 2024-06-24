@@ -31,6 +31,7 @@ export default function NoteCard({
   author,
   assignedClass,
   description,
+  color
 }) {
   const formattedDate = new Date(createdAt).toLocaleDateString("en-US", {
     year: "numeric",
@@ -75,7 +76,7 @@ export default function NoteCard({
         </Link>
         <Stack>
           <Box>
-            <Badge variant="solid" colorScheme="green" w={"fit-content"} px={2}>
+            <Badge variant="solid" colorScheme={color} w={"fit-content"} px={2}>
               {subject}
             </Badge>
             <Badge variant="solid" colorScheme="purple" w={"fit-content"} px={2} ml={2}>

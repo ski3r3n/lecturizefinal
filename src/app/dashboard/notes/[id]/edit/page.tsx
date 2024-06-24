@@ -43,6 +43,11 @@ interface Class {
   description: string;
 }
 
+interface Subject {
+  id: string;
+  name: string;
+}
+
 const MarkdownEditorPage = ({ params }: { params: { id: string } }) => {
   const [user, setUser] = useState<User | null>(null);
   const [creatingNote, setCreatingNote] = useState(false);
@@ -50,6 +55,7 @@ const MarkdownEditorPage = ({ params }: { params: { id: string } }) => {
   const [noteContent, setNoteContent] = useState("");
   const [title, setTitle] = useState("");
   const [classes, setClasses] = useState<Class[]>([]);
+  const [subjects, setSubjects] = useState<Subject[]>([]);
   const [selectedClass, setSelectedClass] = useState("");
   const [selectedSubject, setSelectedSubject] = useState("");
   const [noteId, setNoteId] = useState("");
@@ -59,20 +65,6 @@ const MarkdownEditorPage = ({ params }: { params: { id: string } }) => {
   const router = useRouter();
   const toast = useToast();
 
-  const subjectOptions = {
-    MA: "Mathematics",
-    ELL: "English Language & Literature",
-    TP: "Thinking Programme",
-    HC: "Higher Chinese",
-    PE: "Physical Education",
-    ACC: "Appreciation of Chinese Culture",
-    LSS: "Lower Secondary Science",
-    HI: "History",
-    GE: "Geography",
-    ART: "Art",
-    IF: "Infocomm",
-  };
-
   useEffect(() => {
     const content = localStorage.getItem("noteContent");
     if (content) {
@@ -81,14 +73,20 @@ const MarkdownEditorPage = ({ params }: { params: { id: string } }) => {
   }, []);
 
   useEffect(() => {
-    const fetchClasses = async () => {
-      const response = await fetch("/api/classes");
-      const data = await response.json();
-      console.log(data);
-      setClasses(data);
+    const fetchClassesAndSubjects = async () => {
+      const [classesResponse, subjectsResponse] = await Promise.all([
+        fetch("/api/classes"),
+        fetch("/api/db/subjects"),
+      ]);
+
+      const classesData = await classesResponse.json();
+      const subjectsData = await subjectsResponse.json();
+
+      setClasses(classesData);
+      setSubjects(subjectsData);
     };
 
-    fetchClasses();
+    fetchClassesAndSubjects();
 
     fetch(`/api/notes/get/${params.id}`)
       .then((res) => {
@@ -104,9 +102,10 @@ const MarkdownEditorPage = ({ params }: { params: { id: string } }) => {
         return res.json();
       })
       .then((data) => {
+        console.log(data.note);
         setTitle(data.note.title);
         setSelectedClass(data.note.class.id);
-        setSelectedSubject(data.note.subject);
+        setSelectedSubject(data.note.subject.id); // Use subjectId
         setNoteContent(data.note.content);
         setDescription(data.note.description);
         setNoteId(data.note.id);
@@ -146,7 +145,7 @@ const MarkdownEditorPage = ({ params }: { params: { id: string } }) => {
             body: JSON.stringify({
               title: title,
               content: noteContent,
-              subject: selectedSubject,
+              subjectId: selectedSubject, // Use subjectId
               classId: Number(selectedClass),
               authorId: data.id, // Use the fetched user ID
               description: description,
@@ -161,7 +160,7 @@ const MarkdownEditorPage = ({ params }: { params: { id: string } }) => {
             body: JSON.stringify({
               title: title,
               content: noteContent,
-              subject: selectedSubject,
+              subjectId: Number(selectedSubject), // Use subjectId
               classId: Number(selectedClass),
               noteId: Number(noteId), // Use the fetched user ID
               description: description,
@@ -236,7 +235,6 @@ const MarkdownEditorPage = ({ params }: { params: { id: string } }) => {
         setIsLoading(false); // Hide loading indicator
       });
   };
-  
 
   return (
     <Container maxW="container.xl" py={8}>
@@ -268,9 +266,9 @@ const MarkdownEditorPage = ({ params }: { params: { id: string } }) => {
                 value={selectedSubject}
                 onChange={(e) => setSelectedSubject(e.target.value)}
               >
-                {Object.entries(subjectOptions).map(([key, value]) => (
-                  <option key={key} value={key}>
-                    {value}
+                {subjects.map((subject) => (
+                  <option key={subject.id} value={subject.id}>
+                    {subject.name}
                   </option>
                 ))}
               </Select>

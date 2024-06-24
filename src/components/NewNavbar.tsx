@@ -220,9 +220,11 @@ export default function NewNavbar(props) {
             </Stack>
           </Box>
         ) : null}
+
+        {isLoading ? <Progress size="xs" isIndeterminate /> : ""}
       </Box>
       <Box mt={"64px"}>
-        {isLoading ? <Progress size="xs" isIndeterminate /> : ""}
+        {props.children}
       </Box>
     </>
   );

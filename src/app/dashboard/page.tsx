@@ -23,7 +23,10 @@ interface Note {
   title: string;
   content: string;
   description: string;
-  subject: keyof typeof subjectFullNames;
+  subject: {
+    name: string;
+    code: string; // Added this line
+  };
   createdAt: string;
   author: {
     name: string;
@@ -38,14 +41,36 @@ interface Class {
   name: string;
 }
 
+interface Subject {
+  id: number;
+  code: string;
+  name: string;
+}
+
 export default function Dashboard() {
   const [notes, setNotes] = useState<Note[]>([]);
+  const [classes, setClasses] = useState<Class[]>([]);
+  const [subjects, setSubjects] = useState<Subject[]>([]);
   const [filteredNotes, setFilteredNotes] = useState<Note[]>([]);
   const [sortOrder, setSortOrder] = useState<string>("newest");
   const [filterSubject, setFilterSubject] = useState<string>("");
   const [filterClass, setFilterClass] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [classes, setClasses] = useState<Class[]>([]);
+
+  const subjectColors = {
+    MA: "blue",
+    ELL: "green",
+    TP: "purple",
+    HC: "red",
+    PE: "orange",
+    ACC: "yellow",
+    LSS: "teal",
+    HI: "cyan",
+    GE: "pink",
+    ART: "gray",
+    IF: "blackAlpha",
+  };
+  
 
   useEffect(() => {
     async function fetchNotes() {
@@ -69,14 +94,24 @@ export default function Dashboard() {
       }
     }
 
+    async function fetchSubjects() {
+      const response = await fetch("/api/db/subjects");
+      if (response.ok) {
+        const data = await response.json();
+        setSubjects(data);
+        console.log(data)
+      }
+    }
+
     fetchNotes();
     fetchClasses();
+    fetchSubjects();
   }, []);
 
   useEffect(() => {
     // Filter notes based on selected subject and class
     let sortedFilteredNotes = notes.filter((note) =>
-      (filterSubject ? note.subject === filterSubject : true) &&
+      (filterSubject ? note.subject.code === filterSubject : true) &&
       (filterClass ? note.class.name === filterClass : true)
     );
 
@@ -112,8 +147,8 @@ export default function Dashboard() {
             shadow="base"
           >
             <option value="" key="">All (default)</option>
-            {Object.entries(subjectFullNames).map(([key, name]) => (
-              <option value={key} key={key}>{name}</option>
+            {subjects.map((subject) => (
+              <option value={subject.code} key={subject.id}>{subject.name}</option>
             ))}
           </Select>
           <Select
@@ -123,7 +158,7 @@ export default function Dashboard() {
           >
             <option value="" key="">All Classes</option>
             {classes.map((classItem) => (
-              <option value={classItem.id} key={classItem.id}>{classItem.name}</option>
+              <option value={classItem.name} key={classItem.id}>{classItem.name}</option>
             ))}
           </Select>
         </Grid>
@@ -139,11 +174,12 @@ export default function Dashboard() {
               id={note.id}
               title={note.title}
               content={note.content}
-              subject={note.subject}
+              subject={note.subject?.code}
               assignedClass={note.class.name}
               createdAt={note.createdAt}
               author={note.author}
               description={note.description}
+              color={subjectColors[note.subject?.code] || "gray"}
             />
           ))
         ) : (

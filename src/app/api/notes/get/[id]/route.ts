@@ -1,7 +1,5 @@
-import { PrismaClient } from "@prisma/client";
 import { NextResponse } from "next/server";
-
-const prisma = new PrismaClient();
+import prisma from "@/lib/db";
 
 export async function GET(
   req: Request,
@@ -19,10 +17,7 @@ export async function GET(
   try {
     const note = await prisma.note.findUnique({
       where: { id },
-      include: {
-        author: true, // Include the author data in the response
-        class: true
-      },
+      include: { class: true, author: true, subject: { select: { code: true, name: true, id: true } } },
     });
 
     if (!note) {

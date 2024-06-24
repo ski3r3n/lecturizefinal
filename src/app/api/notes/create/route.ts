@@ -4,23 +4,15 @@ import { NextResponse } from "next/server";
 const prisma = new PrismaClient();
 
 export async function POST(req: Request) {
-  const { title, content, authorId, classId, subject, description } = await req.json();
+  const { title, content, authorId, classId, subjectId, description } = await req.json();
 
-  if (!title || !content || !authorId || !classId || !subject || !description) {
+  if (!title || !content || !authorId || !classId || !subjectId || !description) {
     return NextResponse.json(
       { message: "Missing required fields!" },
       { status: 401 }
     );
   }
 
-  // Optional: Validate that the subject is a valid enum value
-  if (!Object.values(Subject).includes(subject)) {
-    return NextResponse.json(
-      { message: "Invalid subject!" },
-      { status: 400 }
-    );
-  }
-  
   try {
     const newNote = await prisma.note.create({
       data: {
@@ -28,7 +20,7 @@ export async function POST(req: Request) {
         content,
         authorId,
         classId,
-        subject,
+        subjectId,
         description
       },
     });

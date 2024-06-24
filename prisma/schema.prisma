@@ -33,18 +33,11 @@ model Class {
   notes       Note[]
 }
 
-enum Subject {
-  MA   // Mathematics
-  ELL  // English Language & Literature
-  TP   // Thinking Programme
-  HC   // Higher Chinese
-  PE   // Physical Education
-  ACC  // Appreciation of Chinese Culture
-  LSS  // Lower Secondary Science
-  HI   // History
-  GE   // Geography
-  ART  // Art
-  IF   // Infocomm
+model Subject {
+  id   Int    @id @default(autoincrement())
+  code String @unique
+  name String
+  notes Note[]
 }
 
 model Note {
@@ -52,14 +45,16 @@ model Note {
   title       String
   description String?
   content     String
-  subject     Subject?   // Enum for the subject of the note
-  isVisible   Boolean   @default(false) // Added field to control visibility
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  subjectId   Int?         // Add a foreign key to Subject
+  subject     Subject?     @relation(fields: [subjectId], references: [id])
+  isVisible   Boolean      @default(false)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
   authorId    Int
   classId     Int?
-  class       Class?    @relation(fields: [classId], references: [id])
-  author      User      @relation(fields: [authorId], references: [id])
+  class       Class?       @relation(fields: [classId], references: [id])
+  author      User         @relation(fields: [authorId], references: [id])
+  starred     Boolean?     @default(false)
 }
 
 

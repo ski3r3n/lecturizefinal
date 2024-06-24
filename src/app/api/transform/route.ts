@@ -44,7 +44,7 @@ export const POST = async (req: NextRequest, res: any) => {
       messages: [
         {
           role: "user",
-          content: `Summarize this lecture into concise, bullet-pointed markdown notes suitable for high school revision, make it easy to skim through, remember, and revise, addressing the typical needs of a high school student preparing for exams or assessments. The following is the lecture transscription:
+          content: `Summarize this lecture into concise, bullet-pointed markdown notes suitable for high school revision, make it easy to skim through, remember, and revise, addressing the typical needs of a high school student preparing for exams or assessments. Do not add any additional information, only the main points of the lecture, brief explanations and definitions are acceptable, but do not make up content. The following is the lecture transcription:
           ${transcription}`,
         },
       ],

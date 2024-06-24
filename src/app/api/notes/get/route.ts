@@ -1,10 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { jwtVerify } from "jose";
 import { cookies } from "next/headers";
-import { PrismaClient } from "@prisma/client";
+import prisma from "@/lib/db";
 
 const JWT_SECRET = new TextEncoder().encode("LecturizeOnTop");
-const prisma = new PrismaClient();
 
 export async function GET(req: NextRequest) {
   const cookieStore = cookies();
@@ -47,12 +46,12 @@ export async function GET(req: NextRequest) {
     if (user.role === "TEACHER") {
       notes = await prisma.note.findMany({
         where: { authorId: user.id },
-        include: { class: true, author: true },
+        include: { class: true, author: true, subject: { select: { code: true, name: true, id: true } } },
       });
     } else if (user.role === "STUDENT" && user.classId) {
       notes = await prisma.note.findMany({
         where: { classId: user.classId },
-        include: { class: true, author: true },
+        include: { class: true, author: true, subject: { select: { code: true, name: true, id: true } } },
       });
     } else {
       return NextResponse.json(
