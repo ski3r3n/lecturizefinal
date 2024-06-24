@@ -63,9 +63,9 @@ export function Providers({ children }: { children: React.ReactNode }) {
           width="100%"
         >
           {isDashboard ? (
-            <DashboardLayout children={children} />
+            <DashboardLayout>{children}</DashboardLayout>
           ) : (
-            <DefaultLayout children={children} />
+            <DefaultLayout>{children}</DefaultLayout>
           )}
         </Box>
       </LoadingProvider>
