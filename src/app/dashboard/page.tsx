@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { Heading, Flex, Select, Box, Text, Grid, Divider, Progress } from "@chakra-ui/react";
 import NoteCard from "@/components/NoteCard";
 import NoteCardSkeleton from "@/components/skeletons/NoteCardSkeleton";
+import { useUser } from "@/app/hooks/UserContext";
 
 const subjectFullNames = {
   MA: "Mathematics",
@@ -125,7 +126,6 @@ export default function Dashboard() {
     // Update the filteredNotes state
     setFilteredNotes(sortedFilteredNotes);
   }, [notes, sortOrder, filterSubject, filterClass]);
-
   return (
     <>
       <Box padding="4">
@@ -149,7 +149,7 @@ export default function Dashboard() {
               <option value={subject.code} key={subject.id}>{subject.name}</option>
             ))}
           </Select>
-          <Select
+          {user && user.role === "TEACHER" ? (<Select
             placeholder="Filter by Class"
             onChange={(e) => setFilterClass(e.target.value)}
             shadow="base"
@@ -158,7 +158,7 @@ export default function Dashboard() {
             {classes.map((classItem) => (
               <option value={classItem.name} key={classItem.id}>{classItem.name}</option>
             ))}
-          </Select>
+          </Select>)}
         </Grid>
       </Box>
       <Divider />
