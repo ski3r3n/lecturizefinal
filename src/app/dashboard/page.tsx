@@ -137,7 +137,7 @@ export default function Dashboard() {
         <Heading as="h1" size="md" mb="4" fontWeight="bold">
           Manage Your Notes
         </Heading>
-        <Grid templateColumns={{ sm: "repeat(1, 1fr)", md: "repeat(3, 1fr)" }} gap={6}>
+        <Grid templateColumns={{ sm: "repeat(1, 1fr)", md: (user && user.role === "TEACHER" ? ("repeat(3, 1fr)"):("repeat(2, 1fr)")) }} gap={6}>
           <Select
             placeholder="Sort by"
             onChange={(e) => setSortOrder(e.target.value)}
