@@ -110,7 +110,7 @@ const CreateNote = () => {
           body: JSON.stringify({
             title: title,
             content: noteContent,
-            subject: selectedSubject,
+            subjectId: selectedSubject,
             classId: Number(selectedClass),
             authorId: data.id, // Use the fetched user ID
             description: description,
