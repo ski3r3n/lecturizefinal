@@ -57,6 +57,11 @@ export default function Dashboard() {
   const [filterSubject, setFilterSubject] = useState<string>("");
   const [filterClass, setFilterClass] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const { user, userIsLoading } = (useUser() || {
+    user: null,
+    userIsLoading: false,
+  }) as { user: any; userIsLoading: boolean };
+
 
   const subjectColors = {
     MA: "blue",
