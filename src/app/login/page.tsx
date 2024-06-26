@@ -7,6 +7,7 @@ import {
   FormLabel,
   Input,
   InputGroup,
+  InputRightElement,
   Stack,
   Button,
   Heading,
@@ -64,14 +65,23 @@ export default function Login() {
         <Box position="absolute" top={4} left={4}>
           <Logo height="25px" />
         </Box>
-        <Stack spacing={9} textAlign="left">
-          <Heading fontSize={"4xl"} >Start making quick and accurate notes</Heading>
-          <Text fontSize={"lg"} color="white.200">
+        <Stack spacing={6} textAlign="center">
+          <Heading fontSize={"4xl"}>Start making quick and accurate notes</Heading>
+          <Text fontSize={"lg"} color="gray.300">
             Level up your studying journey today.
           </Text>
         </Stack>
       </GridItem>
       <GridItem display="flex" alignItems="center" justifyContent="center">
+        <Flex
+          direction="column"
+          bg={useColorModeValue("white", "gray.700")}
+          boxShadow="lg"
+          p={8}
+          rounded="lg"
+          maxW="md"
+          w="full"
+        >
           <Stack spacing={8}>
             <Stack align="center">
               <Heading fontSize="2xl">Log in to your account</Heading>
@@ -86,15 +96,14 @@ export default function Login() {
                   <FormLabel>Password</FormLabel>
                   <InputGroup>
                     <Input type={showPassword ? "text" : "password"} value={password} onChange={(e) => setPassword(e.target.value)} required />
-                    <Button
-                      variant={"ghost"}
-                      onClick={() => setShowPassword((showPassword) => !showPassword)}
-                      position="absolute"
-                      right={4}
-                      top={4}
-                    >
-                      {showPassword ? <FiEye /> : <FiEyeOff />}
-                    </Button>
+                    <InputRightElement h={"full"}>
+                      <Button
+                        variant={"ghost"}
+                        onClick={() => setShowPassword((showPassword) => !showPassword)}
+                      >
+                        {showPassword ? <FiEye /> : <FiEyeOff />}
+                      </Button>
+                    </InputRightElement>
                   </InputGroup>
                 </FormControl>
                 <Stack spacing={10} pt={2}>
@@ -116,6 +125,7 @@ export default function Login() {
               </Stack>
             </Box>
           </Stack>
+        </Flex>
       </GridItem>
     </Grid>
   );
