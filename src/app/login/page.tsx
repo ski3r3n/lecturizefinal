@@ -7,25 +7,25 @@ import {
   FormLabel,
   Input,
   InputGroup,
-  HStack,
-  InputRightElement,
   Stack,
   Button,
   Heading,
-  Text,
   useColorModeValue,
-  Link,
+  Grid,
+  GridItem,
+  Text,
 } from "@chakra-ui/react";
 import { useState } from "react";
 import { FiEyeOff, FiEye } from "react-icons/fi";
-import { useRouter } from 'next/navigation'
+import { useRouter } from 'next/navigation';
+import Logo from "@/components/logo"; // Import your Logo component
 
 export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const router = useRouter()
+  const router = useRouter();
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -39,7 +39,7 @@ export default function Login() {
     });
 
     if (response.ok) {
-      router.push('/dashboard')
+      router.push('/dashboard');
     } else {
       alert('Invalid credentials');
     }
@@ -47,68 +47,76 @@ export default function Login() {
   };
 
   return (
-    <Flex
+    <Grid
       minH={"100vh"}
-      align={"center"}
-      justify={"center"}
+      templateColumns={{ base: "1fr", md: "1fr 1fr" }}
       bg={useColorModeValue("gray.50", "gray.800")}
     >
-      <Stack spacing={8} mx={"auto"} maxW={"lg"} py={12} px={6}>
-        <Stack align={"center"}>
-          <Heading fontSize={"4xl"} textAlign={"center"}>
-            Sign in
-          </Heading>
-          {/* <Text fontSize={"lg"} color={"gray.600"}>
-            to Lecturise
-          </Text> */}
-        </Stack>
-        <Box
-          rounded={"lg"}
-          bg={useColorModeValue("white", "gray.700")}
-          boxShadow={"lg"}
-          p={8}
-        >
-          <Stack spacing={4}>
-            <FormControl id="email" isRequired>
-              <FormLabel>Email address</FormLabel>
-              <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-            </FormControl>
-            <FormControl id="password" isRequired>
-              <FormLabel>Password</FormLabel>
-              <InputGroup>
-                <Input type={showPassword ? "text" : "password"} value={password} onChange={(e) => setPassword(e.target.value)} required />
-                <InputRightElement h={"full"}>
-                  <Button
-                    variant={"ghost"}
-                    onClick={() =>
-                      setShowPassword((showPassword) => !showPassword)
-                    }
-                  >
-                    {showPassword ? <FiEye></FiEye> : <FiEyeOff></FiEyeOff>}
-                  </Button>
-                </InputRightElement>
-              </InputGroup>
-            </FormControl>
-            <Stack spacing={10} pt={2}>
-              <Button
-                width="100%"
-                isLoading={isLoading}
-                loadingText="Submitting"
-                size="lg"
-                bg={"blue.400"}
-                color={"white"}
-                _hover={{
-                  bg: "blue.500",
-                }}
-                onClick={handleSubmit}
-              >
-                Log In
-              </Button>
-            </Stack>
-            <Stack pt={6}></Stack>
-          </Stack>
+      <GridItem
+        display={{ base: "none", md: "flex" }}
+        alignItems="center"
+        justifyContent="center"
+        bg="teal.500"
+        color="white"
+        position="relative"
+        p={8}
+      >
+        <Box position="absolute" top={4} left={4}>
+          <Logo height="25px" />
         </Box>
-      </Stack>
-    </Flex>
+        <Stack spacing={9} textAlign="left">
+          <Heading fontSize={"4xl"} >Start making quick and accurate notes</Heading>
+          <Text fontSize={"lg"} color="white.200">
+            Level up your studying journey today.
+          </Text>
+        </Stack>
+      </GridItem>
+      <GridItem display="flex" alignItems="center" justifyContent="center">
+          <Stack spacing={8}>
+            <Stack align="center">
+              <Heading fontSize="2xl">Log in to your account</Heading>
+            </Stack>
+            <Box>
+              <Stack spacing={4}>
+                <FormControl id="email" isRequired>
+                  <FormLabel>Email address</FormLabel>
+                  <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+                </FormControl>
+                <FormControl id="password" isRequired>
+                  <FormLabel>Password</FormLabel>
+                  <InputGroup>
+                    <Input type={showPassword ? "text" : "password"} value={password} onChange={(e) => setPassword(e.target.value)} required />
+                    <Button
+                      variant={"ghost"}
+                      onClick={() => setShowPassword((showPassword) => !showPassword)}
+                      position="absolute"
+                      right={4}
+                      top={4}
+                    >
+                      {showPassword ? <FiEye /> : <FiEyeOff />}
+                    </Button>
+                  </InputGroup>
+                </FormControl>
+                <Stack spacing={10} pt={2}>
+                  <Button
+                    width="100%"
+                    isLoading={isLoading}
+                    loadingText="Submitting"
+                    size="lg"
+                    bg={"teal.500"}
+                    color={"white"}
+                    _hover={{
+                      bg: "teal.600",
+                    }}
+                    onClick={handleSubmit}
+                  >
+                    Sign in
+                  </Button>
+                </Stack>
+              </Stack>
+            </Box>
+          </Stack>
+      </GridItem>
+    </Grid>
   );
 }
