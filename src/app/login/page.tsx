@@ -57,13 +57,13 @@ export default function Login() {
         display={{ base: "none", md: "flex" }}
         alignItems="center"
         justifyContent="center"
-        bg="teal.500"
+        bg="teal"
         color="white"
         position="relative"
         p={8}
       >
         <Box position="absolute" top={4} left={4}>
-          <Logo height="25px" />
+          <Logo height="30px" />
         </Box>
         <Stack spacing={6} textAlign="left">
           <Heading fontSize={"4xl"}>Start making quick and accurate notes</Heading>
