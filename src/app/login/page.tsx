@@ -65,7 +65,7 @@ export default function Login() {
         <Box position="absolute" top={4} left={4}>
           <Logo height="25px" />
         </Box>
-        <Stack spacing={6} textAlign="center">
+        <Stack spacing={6} textAlign="left">
           <Heading fontSize={"4xl"}>Start making quick and accurate notes</Heading>
           <Text fontSize={"lg"} color="gray.300">
             Level up your studying journey today.
