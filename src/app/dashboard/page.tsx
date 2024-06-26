@@ -5,19 +5,6 @@ import NoteCard from "@/components/NoteCard";
 import NoteCardSkeleton from "@/components/skeletons/NoteCardSkeleton";
 import { useUser } from "@/app/hooks/UserContext";
 
-const subjectFullNames = {
-  MA: "Mathematics",
-  ELL: "English Language & Literature",
-  TP: "Thinking Programme",
-  HC: "Higher Chinese",
-  PE: "Physical Education",
-  ACC: "Appreciation of Chinese Culture",
-  LSS: "Lower Secondary Science",
-  HI: "History",
-  GE: "Geography",
-  ART: "Art",
-  IF: "Infocomm",
-};
 
 interface Note {
   id: number;

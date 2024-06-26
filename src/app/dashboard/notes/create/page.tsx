@@ -43,12 +43,18 @@ interface Class {
   description: string;
 }
 
+interface Subject {
+  id: string;
+  name: string;
+}
+
 const CreateNote = () => {
   const [user, setUser] = useState<User | null>(null);
   const [description, setDescription] = useState("");
   const [noteContent, setNoteContent] = useState("");
   const [title, setTitle] = useState("");
   const [classes, setClasses] = useState<Class[]>([]);
+  const [subjects, setSubjects] = useState<Subject[]>([]);
   const [selectedClass, setSelectedClass] = useState("");
   const [selectedSubject, setSelectedSubject] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -71,14 +77,21 @@ const CreateNote = () => {
     IF: "Infocomm",
   };
 
-  const fetchClasses = async () => {
-    const response = await fetch("/api/classes");
-    const data = await response.json();
-    setClasses(data);
+  const fetchClassesAndSubjects = async () => {
+    const [classesResponse, subjectsResponse] = await Promise.all([
+      fetch("/api/classes"),
+      fetch("/api/db/subjects"),
+    ]);
+
+    const classesData = await classesResponse.json();
+    const subjectsData = await subjectsResponse.json();
+
+    setClasses(classesData);
+    setSubjects(subjectsData);
   };
 
   useEffect(() => {
-    fetchClasses();
+    fetchClassesAndSubjects();
   }, []);
 
   const handleEditorChange = ({ text }) => {
@@ -110,7 +123,7 @@ const CreateNote = () => {
           body: JSON.stringify({
             title: title,
             content: noteContent,
-            subjectId: selectedSubject,
+            subjectId: Number(selectedSubject), // Use the mapped subject ID
             classId: Number(selectedClass),
             authorId: data.id, // Use the fetched user ID
             description: description,
@@ -177,9 +190,9 @@ const CreateNote = () => {
                 value={selectedSubject}
                 onChange={(e) => setSelectedSubject(e.target.value)}
               >
-                {Object.entries(subjectOptions).map(([key, value]) => (
-                  <option key={key} value={key}>
-                    {value}
+                {subjects.map((subject) => (
+                  <option key={subject.id} value={subject.id}>
+                    {subject.name}
                   </option>
                 ))}
               </Select>
