@@ -13,7 +13,12 @@ export async function POST(req: Request) {
       { status: 401 }
     );
   }
-
+  if (typeof (subjectId) != "number") {
+    return NextResponse.json(
+      { message: "Expected subjectId to be a number" },
+      { status: 400 }
+    );
+  }
   try {
     const updatedNote = await prisma.note.update({
       where: { id: noteId },

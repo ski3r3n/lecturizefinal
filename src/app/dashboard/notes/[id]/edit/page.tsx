@@ -145,7 +145,7 @@ const MarkdownEditorPage = ({ params }: { params: { id: string } }) => {
             body: JSON.stringify({
               title: title,
               content: noteContent,
-              subjectId: selectedSubject, // Use subjectId
+              subjectId: Number(selectedSubject), // Use subjectId
               classId: Number(selectedClass),
               authorId: data.id, // Use the fetched user ID
               description: description,
