@@ -27,7 +27,7 @@
     <img src="./public/assets/img/logo/lecturize-bg-banner.png" alt="Logo" width="" height="80">
   </a>
 
-<h3 align="center">Lecturize</h3>
+<h2 align="center">Lecturize</h3>
 
   <p align="center">
     An awesome way to revise class contents
