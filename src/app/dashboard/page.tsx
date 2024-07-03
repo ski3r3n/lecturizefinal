@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { Heading, Flex, Select, Box, Text, Grid, Divider } from "@chakra-ui/react";
+import { Heading, Flex, Select, Box, Text, Grid, Divider, Spinner } from "@chakra-ui/react";
 import NoteCard from "@/components/NoteCard";
 import NoteCardSkeleton from "@/components/skeletons/NoteCardSkeleton";
 import { useUser } from "@/app/hooks/UserContext";
@@ -117,7 +117,7 @@ export default function Dashboard() {
     // Update the filteredNotes state
     setFilteredNotes(sortedFilteredNotes);
   }, [notes, sortOrder, filterSubject, filterClass]);
-
+  if 
   return (
     <>
       <Box padding="4">
@@ -188,6 +188,7 @@ export default function Dashboard() {
           <Text>No notes found for the selected criteria.</Text>
         )}
       </Flex>
+      
     </>
   );
 }

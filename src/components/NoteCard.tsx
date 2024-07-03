@@ -44,8 +44,11 @@ export default function NoteCard({
   return (
     <Center py={6}>
       <Box
-        maxW={"300px"}
+        maxW={"280px"}
         minW={"280px"}
+        minH={"380px"}
+        margin={"10px"}
+        maxH={"380px"}
         w={"full"}
         bg={useColorModeValue("white", "gray.900")}
         boxShadow={"2xl"}
