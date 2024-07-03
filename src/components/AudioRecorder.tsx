@@ -10,10 +10,11 @@ import {
   useColorModeValue,
   FormControl,
   FormLabel,
-  Select,
   Input,
   Spinner,
+  IconButton,
 } from "@chakra-ui/react";
+import { IoIosMic, IoIosSquare, IoIosPause, IoIosPlay } from "react-icons/io";
 
 interface Class {
   id: number;
@@ -156,7 +157,7 @@ function AudioRecorder() {
         localStorage.setItem("markdownContent", data.summary);
         localStorage.setItem("newNoteId", data.id);
         setIsLoading(false); // Update loading state
-        router.push(`/dashboard/notes/${data.id}/edit`)
+        router.push(`/dashboard/notes/${data.id}/edit`);
       })
       .catch((error) => {
         console.error("There was a problem with the fetch operation:", error);
@@ -182,30 +183,32 @@ function AudioRecorder() {
               <FormLabel>Upload an Audio File</FormLabel>
               <Input type="file" accept="audio/*" onChange={handleFileChange} />
             </FormControl>
-            <Button
-              colorScheme={recording ? "red" : "green"}
-              onClick={toggleRecording}
-              ref={saveButtonRef}
-              size="lg"
-              borderRadius="lg"
-              px="8"
-              fontWeight="bold"
-            >
-              {recording ? "Stop Recording" : "Start Recording"}
-            </Button>
 
-            {recording && (
-              <Button
-                onClick={togglePause}
-                colorScheme="blue"
-                size="md"
-                borderRadius="md"
-                fontWeight="bold"
-                mr="2"
-              >
-                {paused ? "Resume" : "Pause"}
-              </Button>
-            )}
+            <Box display="flex" alignItems="center" justifyContent="center">
+              <IconButton
+                aria-label={recording ? "Stop Recording" : "Start Recording"}
+                icon={recording ? <IoIosSquare /> : <IoIosMic />}
+                onClick={toggleRecording}
+                ref={saveButtonRef}
+                size="lg"
+                colorScheme="red"
+                isRound
+                _hover={{ transform: "scale(1.1)" }}
+                
+              />
+              {recording && (
+                <IconButton
+                  aria-label={paused ? "Resume" : "Pause"}
+                  icon={paused ? <IoIosPlay /> : <IoIosPause />}
+                  onClick={togglePause}
+                  size="lg"
+                  colorScheme="red"
+                  ml={4}
+                  isRound
+                  _hover={{ transform: "scale(1.1)" }}
+                />
+              )}
+            </Box>
 
             <Text fontSize="xl" fontWeight="bold">
               {formatTime(timer)}
