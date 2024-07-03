@@ -117,7 +117,6 @@ export default function Dashboard() {
     // Update the filteredNotes state
     setFilteredNotes(sortedFilteredNotes);
   }, [notes, sortOrder, filterSubject, filterClass]);
-  if 
   return (
     <>
       <Box padding="4">
