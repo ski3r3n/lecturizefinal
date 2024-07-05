@@ -34,7 +34,7 @@ export default function Home() {
       <Head>
         <title>Lecturize</title>
       </Head>
-      <Box bgColor="#f3f5f8" w="100vw" h="100vh" postion="fixed">
+      <Box bgColor="#f3f5f8" w="100vw" h="100vh" position="fixed">
         <Navbar loggedin={0}></Navbar>
         <br></br>
         <br></br>
