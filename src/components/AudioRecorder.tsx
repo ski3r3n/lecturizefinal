@@ -16,13 +16,6 @@ import {
 } from "@chakra-ui/react";
 import { IoIosMic, IoIosSquare, IoIosPause, IoIosPlay } from "react-icons/io";
 
-interface Class {
-  id: number;
-  name: string;
-}
-
-let autoclick = 0;
-
 function AudioRecorder() {
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
   const [recording, setRecording] = useState(false);
@@ -32,6 +25,7 @@ function AudioRecorder() {
   const [audioURL, setAudioURL] = useState<string | null>(null);
   const [audioFile, setAudioFile] = useState<File | null>(null);
   const [isLoading, setIsLoading] = useState(false); // State to manage loading indicator
+  const [error, setError] = useState<string | null>(null); // State to manage errors
   const saveButtonRef = useRef<HTMLButtonElement | null>(null);
   const router = useRouter();
 
@@ -67,35 +61,24 @@ function AudioRecorder() {
       setAudioChunks([]); // Reset audio chunks
       setTimer(0);
 
+      const localChunks: Blob[] = [];
+
       recorder.addEventListener("dataavailable", (event) => {
-        if (event.data.size > 0) {
-          setAudioChunks((prevChunks) => [...prevChunks, event.data]);
-        }
+        localChunks.push(event.data);
       });
 
       recorder.addEventListener("stop", () => {
-        const audioBlob = new Blob(audioChunks, { type: "audio/wav" });
-        const audioUrl = URL.createObjectURL(audioBlob);
-        setAudioURL(audioUrl);
-        const audioFile = new File(audioChunks, "recording.wav", {
-          type: "audio/wav",
-        });
-        setAudioFile(audioFile);
         setRecording(false);
         setPaused(false);
         setTimer(0); // Reset timer
 
-        if (autoclick === 0) {
-          autoclick = 1;
-          setTimeout(function () {
-            saveButtonRef.current!.click();
-          }, 100);
-          setTimeout(function () {
-            saveButtonRef.current!.click();
-          }, 200);
-        } else if (autoclick === 1) {
-          autoclick = 0;
-        }
+        const audioBlob = new Blob(localChunks, { type: "audio/wav" });
+        const audioUrl = URL.createObjectURL(audioBlob);
+        setAudioURL(audioUrl);
+        const audioFile = new File(localChunks, "recording.wav", {
+          type: "audio/wav",
+        });
+        setAudioFile(audioFile);
       });
 
       recorder.start();
@@ -103,6 +86,7 @@ function AudioRecorder() {
       setPaused(false);
     } catch (error) {
       console.error("Error accessing microphone:", error);
+      setError("Error accessing microphone. Please check your device settings.");
     }
   };
 
@@ -194,7 +178,6 @@ function AudioRecorder() {
                 colorScheme="red"
                 isRound
                 _hover={{ transform: "scale(1.1)" }}
-                
               />
               {recording && (
                 <IconButton
@@ -213,6 +196,12 @@ function AudioRecorder() {
             <Text fontSize="xl" fontWeight="bold">
               {formatTime(timer)}
             </Text>
+
+            {error && (
+              <Text color="red.500" fontSize="md">
+                {error}
+              </Text>
+            )}
 
             <audio
               controls
