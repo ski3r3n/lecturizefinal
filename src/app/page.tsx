@@ -26,7 +26,7 @@ import {
   UnorderedList,
 } from "@chakra-ui/react";
 import Navbar from "@/components/Navbar";
-import Head from 'next/head'
+import Head from "next/head";
 
 export default function Home() {
   return (
@@ -36,23 +36,29 @@ export default function Home() {
       </Head>
       <Box bgColor="#f3f5f8" w="100vw" h="100vh" position="fixed"></Box>
       <Navbar loggedin={0}></Navbar>
-      <br></br>
+      {/* <br></br>
       <br></br>
       <br></br>
 
       <br></br>
       <br></br>
-      <br></br>
-      <Box margin="auto" w="fit-content" display="flex">
+      <br></br> */}
+      <Box margin="auto" w="fit-content" display="flex" mt="20vh">
         <Heading color="red">Lecturise:&nbsp;</Heading>
         <Heading> Your lectures,&nbsp;</Heading>
         <Heading color="ForestGreen">noted.</Heading>
       </Box>
+      {/* <br></br>
       <br></br>
       <br></br>
-      <br></br>
-      <br></br>
+      <br></br> */}
       <Card variant="filled" margin="auto" bgColor="white" w="50%">
+        <CardHeader display="flex" textAlign="center">
+          <Heading color="red">Lecturise:&nbsp;</Heading>
+          <Heading> Your lectures,&nbsp;</Heading>
+          <Heading color="ForestGreen">noted.</Heading>
+        </CardHeader>
+
         <CardHeader>
           <Heading size="xl">Lecturise is:</Heading>
         </CardHeader>
