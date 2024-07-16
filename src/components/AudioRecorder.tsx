@@ -175,6 +175,7 @@ function AudioRecorder() {
                 onClick={toggleRecording}
                 ref={saveButtonRef}
                 size="lg"
+                boxSize="80px"
                 colorScheme="red"
                 isRound
                 _hover={{ transform: "scale(1.1)" }}
@@ -187,6 +188,7 @@ function AudioRecorder() {
                   size="lg"
                   colorScheme="red"
                   ml={4}
+                  boxSize="80px"
                   isRound
                   _hover={{ transform: "scale(1.1)" }}
                 />
