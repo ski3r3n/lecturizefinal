@@ -171,7 +171,7 @@ function AudioRecorder() {
             <Box display="flex" alignItems="center" justifyContent="center">
               <IconButton
                 aria-label={recording ? "Stop Recording" : "Start Recording"}
-                icon={recording ? <IoIosSquare /> : <IoIosMic />}
+                icon={recording ? <IoIosSquare boxSize="40px"/> : <IoIosMic boxSize="40px"/>}
                 onClick={toggleRecording}
                 ref={saveButtonRef}
                 size="lg"
@@ -183,7 +183,7 @@ function AudioRecorder() {
               {recording && (
                 <IconButton
                   aria-label={paused ? "Resume" : "Pause"}
-                  icon={paused ? <IoIosPlay /> : <IoIosPause />}
+                  icon={paused ? <IoIosPlay boxSize="40px"/> : <IoIosPause boxSize="40px"/>}
                   onClick={togglePause}
                   size="lg"
                   colorScheme="red"
