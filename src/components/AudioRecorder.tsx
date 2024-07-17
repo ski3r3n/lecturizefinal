@@ -171,25 +171,27 @@ function AudioRecorder() {
             <Box display="flex" alignItems="center" justifyContent="center">
               <IconButton
                 aria-label={recording ? "Stop Recording" : "Start Recording"}
-                icon={recording ? <IoIosSquare boxSize="40px"/> : <IoIosMic boxSize="40px"/>}
+                icon={recording ? <IoIosSquare /> : <IoIosMic />}
                 onClick={toggleRecording}
                 ref={saveButtonRef}
                 size="lg"
-                boxSize="80px"
                 colorScheme="red"
                 isRound
+                boxSize="80px" // Adjust this value to make the button larger
+                fontSize="40px" // Adjust this value to make the icon larger
                 _hover={{ transform: "scale(1.1)" }}
               />
               {recording && (
                 <IconButton
                   aria-label={paused ? "Resume" : "Pause"}
-                  icon={paused ? <IoIosPlay boxSize="40px"/> : <IoIosPause boxSize="40px"/>}
+                  icon={paused ? <IoIosPlay /> : <IoIosPause />}
                   onClick={togglePause}
                   size="lg"
                   colorScheme="red"
                   ml={4}
-                  boxSize="80px"
                   isRound
+                  boxSize="80px" // Adjust this value to make the button larger
+                  fontSize="40px" // Adjust this value to make the icon larger
                   _hover={{ transform: "scale(1.1)" }}
                 />
               )}
