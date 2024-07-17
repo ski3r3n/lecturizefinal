@@ -31,6 +31,7 @@ export const POST = async (req: NextRequest, res: any) => {
   }
 
   try {
+    console.log("Whispering")
     // Transcribe using OpenAI Whisper API
     const whisperResponse = await openai.audio.transcriptions.create({
       file: file,
@@ -40,6 +41,7 @@ export const POST = async (req: NextRequest, res: any) => {
     const transcription = whisperResponse.text;
 
     // Summarize using OpenAI ChatGPT API
+    console.log("transcribing")
     const gptResponse = await openai.chat.completions.create({
       messages: [
         {
