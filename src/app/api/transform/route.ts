@@ -50,7 +50,7 @@ export const POST = async (req: NextRequest, res: any) => {
           ${transcription}`,
         },
       ],
-      model: "gpt-3.5-turbo-16k",
+      model: "gpt-4o-mini",
     });
 
     const summary = gptResponse.choices[0].message.content;
