@@ -1,9 +1,7 @@
 import { NextResponse } from "next/server";
 import { NextRequest } from "next/server";
 import { OpenAI } from "openai";
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
+import prisma from "@/lib/db";
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -23,10 +21,12 @@ async function getHighestNoteId() {
 }
 
 export const POST = async (req: NextRequest) => {
-  const { transcription } = await req.json();
+  const transcription = await req.text();
 
   if (!transcription) {
+    console.log(transcription)
     return NextResponse.json({ error: "No transcription provided." }, { status: 400 });
+    
   }
 
   try {

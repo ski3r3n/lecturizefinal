@@ -1,10 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { jwtVerify } from 'jose';
 import { cookies } from 'next/headers';
-import { PrismaClient } from '@prisma/client';
+import prisma from "@/lib/db";
 
 const JWT_SECRET = new TextEncoder().encode('LecturizeOnTop');
-const prisma = new PrismaClient();
 
 export async function GET(req: NextRequest) {
     try {

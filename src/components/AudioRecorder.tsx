@@ -32,6 +32,8 @@ function AudioRecorder() {
   const [audioFile, setAudioFile] = useState<File | null>(null);
   const [isLoading, setIsLoading] = useState(false); // State to manage loading indicator
   const [error, setError] = useState<string | null>(null); // State to manage errors
+  const [progress, setProgress] = useState<string>(""); // State to manage progress updates
+  const [totalTime, setTotalTime] = useState<number>(0); // Total recording time in seconds
   const saveButtonRef = useRef<HTMLButtonElement | null>(null);
   const router = useRouter();
   const [ffmpegReady, setFfmpegReady] = useState(false);
@@ -52,7 +54,9 @@ function AudioRecorder() {
   }, [recording, paused]);
 
   const loadFfmpeg = async () => {
-    await ffmpeg.load();
+    if (!ffmpeg.isLoaded()) {
+      await ffmpeg.load();
+    }
     setFfmpegReady(true);
   };
 
@@ -95,6 +99,7 @@ function AudioRecorder() {
           type: "audio/wav",
         });
         setAudioFile(audioFile);
+        setTotalTime(Math.floor(audioBlob.size / (16 * 1024 * 60 / 8))); // Approximate total time
       });
 
       recorder.start();
@@ -132,11 +137,32 @@ function AudioRecorder() {
     }
   };
 
+  const parseFfmpegLog = (message: string) => {
+    const timeRegex = /time=(\d+):(\d+):(\d+)/;
+    const match = message.match(timeRegex);
+    if (match) {
+      const hours = parseInt(match[1], 10);
+      const minutes = parseInt(match[2], 10);
+      const seconds = parseInt(match[3], 10);
+      const currentTime = hours * 3600 + minutes * 60 + seconds;
+      setProgress(
+        `Converting to MP3: ${formatTime(currentTime)} / ${formatTime(totalTime)}`
+      );
+    }
+  };
+
   const splitAndUpload = async (file: File) => {
     if (!ffmpegReady) return;
 
+    setProgress("Preparing to process the file...");
+
     // Read the file
     ffmpeg.FS("writeFile", "input.wav", await fetchFile(file));
+    setProgress("File loaded successfully. Converting to MP3...");
+
+    ffmpeg.setLogger(({ message }) => {
+      parseFfmpegLog(message);
+    });
 
     // Convert to MP3
     await ffmpeg.run(
@@ -148,6 +174,7 @@ function AudioRecorder() {
       "2",
       "input.mp3"
     );
+    setProgress("Conversion to MP3 completed. Splitting the MP3...");
 
     // Split the MP3
     await ffmpeg.run(
@@ -161,6 +188,7 @@ function AudioRecorder() {
       "copy",
       "out%03d.mp3"
     );
+    setProgress("Splitting completed. Uploading chunks...");
 
     // Iterate over the chunks and upload each
     const chunkFiles = ffmpeg
@@ -168,7 +196,10 @@ function AudioRecorder() {
       .filter((file) => file.startsWith("out"));
     let transcription = "";
 
-    for (let file of chunkFiles) {
+    for (let i = 0; i < chunkFiles.length; i++) {
+      const file = chunkFiles[i];
+      setProgress(`Uploading chunk ${i + 1} of ${chunkFiles.length}...`);
+
       // Read the chunk
       const data = ffmpeg.FS("readFile", file);
       const blob = new Blob([data.buffer], { type: "audio/mp3" });
@@ -191,8 +222,11 @@ function AudioRecorder() {
       transcription += result.transcription;
     }
 
+    setProgress("All chunks uploaded. Sending combined transcription to ChatGPT...");
+
     // Send combined transcription to ChatGPT API
     console.log(transcription)
+    
     const chatResponse = await fetch("/api/transform/gpt", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -232,7 +266,7 @@ function AudioRecorder() {
         {isLoading ? (
           <>
             <Spinner size="xl" />
-            <Text mt={5}>Your recording is being processed...</Text>
+            <Text mt={5}>{progress}</Text>
           </>
         ) : (
           <>
