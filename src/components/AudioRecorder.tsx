@@ -36,14 +36,15 @@ function AudioRecorder() {
   const [timer, setTimer] = useState(0);
   const [audioURL, setAudioURL] = useState<string | null>(null);
   const [audioFile, setAudioFile] = useState<File | null>(null);
-  const [isLoading, setIsLoading] = useState(false); // State to manage loading indicator
-  const [error, setError] = useState<string | null>(null); // State to manage errors
-  const [progress, setProgress] = useState<string>(""); // State to manage progress updates
-  const [totalTime, setTotalTime] = useState<number>(0); // Total recording time in seconds
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [progress, setProgress] = useState<string>("");
+  const [totalTime, setTotalTime] = useState<number>(0);
+  const [ffmpegReady, setFfmpegReady] = useState(false);
+  const [cancelProcessing, setCancelProcessing] = useState<boolean>(false);
+
   const saveButtonRef = useRef<HTMLButtonElement | null>(null);
   const router = useRouter();
-  const [ffmpegReady, setFfmpegReady] = useState(false);
-  const [cancelProcessing, setCancelProcessing] = useState<boolean>(false); // State to manage cancel
 
   useEffect(() => {
     let interval: NodeJS.Timeout | null = null;
@@ -79,7 +80,7 @@ function AudioRecorder() {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       const recorder = new MediaRecorder(stream);
       setMediaRecorder(recorder);
-      setAudioChunks([]); // Reset audio chunks
+      setAudioChunks([]);
       setTimer(0);
 
       const localChunks: Blob[] = [];
@@ -91,7 +92,7 @@ function AudioRecorder() {
       recorder.addEventListener("stop", () => {
         setRecording(false);
         setPaused(false);
-        setTimer(0); // Reset timer
+        setTimer(0);
 
         const audioBlob = new Blob(localChunks, { type: "audio/wav" });
         const audioUrl = URL.createObjectURL(audioBlob);
@@ -170,7 +171,6 @@ function AudioRecorder() {
     setProgress("Preparing to process the file...");
 
     try {
-      // Read the file
       ffmpeg.FS("writeFile", "input.wav", await fetchFile(file));
       setProgress("File loaded successfully. Converting to MP3...");
 
@@ -178,7 +178,6 @@ function AudioRecorder() {
         parseFfmpegLog(message);
       });
 
-      // Convert to MP3
       await ffmpeg.run(
         "-i",
         "input.wav",
@@ -191,7 +190,6 @@ function AudioRecorder() {
 
       setProgress("Conversion to MP3 completed. Splitting the MP3...");
 
-      // Split the MP3
       await ffmpeg.run(
         "-i",
         "input.mp3",
@@ -206,7 +204,6 @@ function AudioRecorder() {
 
       setProgress("Splitting completed. Uploading chunks...");
 
-      // Iterate over the chunks and upload each
       const chunkFiles = ffmpeg
         .FS("readdir", "/")
         .filter((file) => file.startsWith("out"));
@@ -222,7 +219,6 @@ function AudioRecorder() {
         const file = chunkFiles[i];
         setProgress(`Uploading chunk ${i + 1} of ${chunkFiles.length}...`);
 
-        // Read the chunk
         const data = ffmpeg.FS("readFile", file);
         const blob = new Blob([data.buffer], { type: "audio/mp3" });
         const chunkFile = new File([blob], file, { type: "audio/mp3" });
@@ -271,6 +267,16 @@ function AudioRecorder() {
       } else {
         console.log("Some other error happened!", error);
       }
+      if (!cancelProcessing) {
+        setProgress("An error occurred during processing.");
+      }
+    } finally {
+      if (cancelProcessing) {
+        // Ensure ffmpeg is reinitialized properly
+        await initFFmpeg();
+        setFfmpegReady(true);
+      }
+      setIsLoading(false);
     }
   };
 
@@ -285,15 +291,13 @@ function AudioRecorder() {
       return;
     }
 
-    setIsLoading(true); // Set loading true when upload starts
-    setCancelProcessing(false); // Reset cancel state
+    setIsLoading(true);
+    setCancelProcessing(false);
 
     try {
       await splitAndUpload(audioFile);
-      setIsLoading(false); // Update loading state
     } catch (error) {
       console.error("There was a problem with the upload operation:", error);
-      setIsLoading(false); // Update loading state
       if (cancelProcessing) {
         setProgress("Processing canceled.");
       } else {
@@ -303,11 +307,34 @@ function AudioRecorder() {
   };
 
   const cancelUpload = async () => {
+    console.log("Cancelling...");
     setCancelProcessing(true);
     setProgress("Canceling the process...");
-    ffmpeg.exit();
+
+    try {
+      ffmpeg.exit();
+    } catch (error) {
+      console.error("Error during ffmpeg exit:", error);
+    }
+
+    // Ensure ffmpeg is reinitialized for future use
     await initFFmpeg();
-    setFfmpegReady(true); // Ensure ffmpegReady is set to true after reinitializing
+    setFfmpegReady(true);
+
+    // Clear the file system
+    // ffmpeg.FS("unlink", "input.wav");
+    ffmpeg.FS("unlink", "input.mp3");
+    const chunkFiles = ffmpeg.FS("readdir", "/").filter((file) => file.startsWith("out"));
+    chunkFiles.forEach((file) => ffmpeg.FS("unlink", file));
+
+    console.log("ffmpeg ready after cancel");
+
+    // Reset states
+    setAudioFile(null);
+    setAudioURL(null);
+    setError(null);
+    setTimer(0);
+    setProgress("");
   };
 
   const recordingColor = useColorModeValue("#e74c3c", "#ff0000");
@@ -341,8 +368,8 @@ function AudioRecorder() {
                 size="lg"
                 colorScheme="red"
                 isRound
-                boxSize="80px" // Adjust this value to make the button larger
-                fontSize="40px" // Adjust this value to make the icon larger
+                boxSize="80px"
+                fontSize="40px"
                 _hover={{ transform: "scale(1.1)" }}
               />
               {recording && (
@@ -354,8 +381,8 @@ function AudioRecorder() {
                   colorScheme="red"
                   ml={4}
                   isRound
-                  boxSize="80px" // Adjust this value to make the button larger
-                  fontSize="40px" // Adjust this value to make the icon larger
+                  boxSize="80px"
+                  fontSize="40px"
                   _hover={{ transform: "scale(1.1)" }}
                 />
               )}
