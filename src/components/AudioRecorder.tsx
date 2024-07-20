@@ -17,10 +17,16 @@ import {
 import { IoIosMic, IoIosSquare, IoIosPause, IoIosPlay } from "react-icons/io";
 import { createFFmpeg, fetchFile } from "@ffmpeg/ffmpeg";
 
-const ffmpeg = createFFmpeg({
+let ffmpeg = createFFmpeg({
   log: true,
   corePath: "https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.11.0/dist/ffmpeg-core.js",
 });
+
+async function initFFmpeg() {
+  if (!ffmpeg.isLoaded()) {
+    await ffmpeg.load();
+  }
+}
 
 function AudioRecorder() {
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
@@ -37,6 +43,7 @@ function AudioRecorder() {
   const saveButtonRef = useRef<HTMLButtonElement | null>(null);
   const router = useRouter();
   const [ffmpegReady, setFfmpegReady] = useState(false);
+  const [cancelProcessing, setCancelProcessing] = useState<boolean>(false); // State to manage cancel
 
   useEffect(() => {
     let interval: NodeJS.Timeout | null = null;
@@ -53,24 +60,18 @@ function AudioRecorder() {
     };
   }, [recording, paused]);
 
-  const loadFfmpeg = async () => {
-    if (!ffmpeg.isLoaded()) {
-      await ffmpeg.load();
-    }
-    setFfmpegReady(true);
-  };
-
   useEffect(() => {
+    const loadFfmpeg = async () => {
+      await initFFmpeg();
+      setFfmpegReady(true);
+    };
     loadFfmpeg();
   }, []);
 
   const formatTime = (timeInSeconds: number) => {
     const minutes = Math.floor(timeInSeconds / 60);
     const seconds = timeInSeconds % 60;
-    return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(
-      2,
-      "0"
-    )}`;
+    return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
   };
 
   const startRecording = async () => {
@@ -99,7 +100,11 @@ function AudioRecorder() {
           type: "audio/wav",
         });
         setAudioFile(audioFile);
-        setTotalTime(Math.floor(audioBlob.size / (16 * 1024 * 60 / 8))); // Approximate total time
+
+        const audio = new Audio(audioUrl);
+        audio.addEventListener("loadedmetadata", () => {
+          setTotalTime(Math.floor(audio.duration));
+        });
       });
 
       recorder.start();
@@ -134,6 +139,11 @@ function AudioRecorder() {
       const file = event.target.files[0];
       setAudioFile(file);
       setAudioURL(URL.createObjectURL(file));
+
+      const audio = new Audio(URL.createObjectURL(file));
+      audio.addEventListener("loadedmetadata", () => {
+        setTotalTime(Math.floor(audio.duration));
+      });
     }
   };
 
@@ -152,91 +162,116 @@ function AudioRecorder() {
   };
 
   const splitAndUpload = async (file: File) => {
-    if (!ffmpegReady) return;
+    if (!ffmpegReady) {
+      console.error("ffmpeg is not ready");
+      return;
+    }
 
     setProgress("Preparing to process the file...");
 
-    // Read the file
-    ffmpeg.FS("writeFile", "input.wav", await fetchFile(file));
-    setProgress("File loaded successfully. Converting to MP3...");
+    try {
+      // Read the file
+      ffmpeg.FS("writeFile", "input.wav", await fetchFile(file));
+      setProgress("File loaded successfully. Converting to MP3...");
 
-    ffmpeg.setLogger(({ message }) => {
-      parseFfmpegLog(message);
-    });
-
-    // Convert to MP3
-    await ffmpeg.run(
-      "-i",
-      "input.wav",
-      "-codec:a",
-      "libmp3lame",
-      "-qscale:a",
-      "2",
-      "input.mp3"
-    );
-    setProgress("Conversion to MP3 completed. Splitting the MP3...");
-
-    // Split the MP3
-    await ffmpeg.run(
-      "-i",
-      "input.mp3",
-      "-f",
-      "segment",
-      "-segment_time",
-      "180",
-      "-c",
-      "copy",
-      "out%03d.mp3"
-    );
-    setProgress("Splitting completed. Uploading chunks...");
-
-    // Iterate over the chunks and upload each
-    const chunkFiles = ffmpeg
-      .FS("readdir", "/")
-      .filter((file) => file.startsWith("out"));
-    let transcription = "";
-
-    for (let i = 0; i < chunkFiles.length; i++) {
-      const file = chunkFiles[i];
-      setProgress(`Uploading chunk ${i + 1} of ${chunkFiles.length}...`);
-
-      // Read the chunk
-      const data = ffmpeg.FS("readFile", file);
-      const blob = new Blob([data.buffer], { type: "audio/mp3" });
-      const chunkFile = new File([blob], file, { type: "audio/mp3" });
-
-      // Send chunk to Whisper API
-      const formData = new FormData();
-      formData.append("file", chunkFile);
-
-      const response = await fetch("/api/transform/whisper", {
-        method: "POST",
-        body: formData,
+      ffmpeg.setLogger(({ message }) => {
+        parseFfmpegLog(message);
       });
 
-      if (!response.ok) {
-        throw new Error("Failed to upload chunk");
+      // Convert to MP3
+      await ffmpeg.run(
+        "-i",
+        "input.wav",
+        "-codec:a",
+        "libmp3lame",
+        "-qscale:a",
+        "2",
+        "input.mp3"
+      );
+
+      setProgress("Conversion to MP3 completed. Splitting the MP3...");
+
+      // Split the MP3
+      await ffmpeg.run(
+        "-i",
+        "input.mp3",
+        "-f",
+        "segment",
+        "-segment_time",
+        "180",
+        "-c",
+        "copy",
+        "out%03d.mp3"
+      );
+
+      setProgress("Splitting completed. Uploading chunks...");
+
+      // Iterate over the chunks and upload each
+      const chunkFiles = ffmpeg
+        .FS("readdir", "/")
+        .filter((file) => file.startsWith("out"));
+      let transcription = "";
+
+      for (let i = 0; i < chunkFiles.length; i++) {
+        if (cancelProcessing) {
+          setProgress("Processing canceled.");
+          setIsLoading(false);
+          return;
+        }
+
+        const file = chunkFiles[i];
+        setProgress(`Uploading chunk ${i + 1} of ${chunkFiles.length}...`);
+
+        // Read the chunk
+        const data = ffmpeg.FS("readFile", file);
+        const blob = new Blob([data.buffer], { type: "audio/mp3" });
+        const chunkFile = new File([blob], file, { type: "audio/mp3" });
+
+        const formData = new FormData();
+        formData.append("file", chunkFile);
+
+        try {
+          const response = await fetch("/api/transform/whisper", {
+            method: "POST",
+            body: formData,
+          });
+
+          if (!response.ok) {
+            throw new Error("Failed to upload chunk");
+          }
+
+          const result = await response.json();
+          transcription += result.transcription;
+        } catch (error) {
+          console.error("Error during chunk upload:", error);
+          if (cancelProcessing) {
+            setProgress("Processing canceled.");
+            setIsLoading(false);
+            return;
+          }
+        }
       }
 
-      const result = await response.json();
-      transcription += result.transcription;
+      setProgress("All chunks uploaded. Sending combined transcription to ChatGPT...");
+
+      const chatResponse = await fetch("/api/transform/gpt", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ transcription }),
+      });
+
+      const chatData = await chatResponse.json();
+      localStorage.setItem("markdownContent", chatData.summary);
+      localStorage.setItem("newNoteId", chatData.id);
+      router.push(`/dashboard/notes/${chatData.id}/edit`);
+    } catch (error: any) {
+      console.error("Error during processing:", error);
+      if (error.message === "ffmpeg has exited") {
+        console.log("The operation was canceled!");
+      } else {
+        console.log("Some other error happened!", error);
+      }
     }
-
-    setProgress("All chunks uploaded. Sending combined transcription to ChatGPT...");
-
-    // Send combined transcription to ChatGPT API
-    console.log(transcription)
-    
-    const chatResponse = await fetch("/api/transform/gpt", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ transcription }),
-    });
-
-    const chatData = await chatResponse.json();
-    localStorage.setItem("markdownContent", chatData.summary);
-    localStorage.setItem("newNoteId", chatData.id);
-    router.push(`/dashboard/notes/${chatData.id}/edit`);
   };
 
   const uploadFile = async () => {
@@ -245,7 +280,13 @@ function AudioRecorder() {
       return;
     }
 
+    if (!ffmpegReady) {
+      console.error("ffmpeg is not ready");
+      return;
+    }
+
     setIsLoading(true); // Set loading true when upload starts
+    setCancelProcessing(false); // Reset cancel state
 
     try {
       await splitAndUpload(audioFile);
@@ -253,7 +294,20 @@ function AudioRecorder() {
     } catch (error) {
       console.error("There was a problem with the upload operation:", error);
       setIsLoading(false); // Update loading state
+      if (cancelProcessing) {
+        setProgress("Processing canceled.");
+      } else {
+        setProgress("An error occurred during processing.");
+      }
     }
+  };
+
+  const cancelUpload = async () => {
+    setCancelProcessing(true);
+    setProgress("Canceling the process...");
+    ffmpeg.exit();
+    await initFFmpeg();
+    setFfmpegReady(true); // Ensure ffmpegReady is set to true after reinitializing
   };
 
   const recordingColor = useColorModeValue("#e74c3c", "#ff0000");
@@ -267,6 +321,9 @@ function AudioRecorder() {
           <>
             <Spinner size="xl" />
             <Text mt={5}>{progress}</Text>
+            <Button colorScheme="red" onClick={cancelUpload}>
+              Cancel
+            </Button>
           </>
         ) : (
           <>
