@@ -15,6 +15,12 @@ import {
   IconButton,
 } from "@chakra-ui/react";
 import { IoIosMic, IoIosSquare, IoIosPause, IoIosPlay } from "react-icons/io";
+import { createFFmpeg, fetchFile } from "@ffmpeg/ffmpeg";
+
+const ffmpeg = createFFmpeg({
+  log: true,
+  corePath: "https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.11.0/dist/ffmpeg-core.js",
+});
 
 function AudioRecorder() {
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
@@ -28,6 +34,7 @@ function AudioRecorder() {
   const [error, setError] = useState<string | null>(null); // State to manage errors
   const saveButtonRef = useRef<HTMLButtonElement | null>(null);
   const router = useRouter();
+  const [ffmpegReady, setFfmpegReady] = useState(false);
 
   useEffect(() => {
     let interval: NodeJS.Timeout | null = null;
@@ -43,6 +50,15 @@ function AudioRecorder() {
       if (interval) clearInterval(interval);
     };
   }, [recording, paused]);
+
+  const loadFfmpeg = async () => {
+    await ffmpeg.load();
+    setFfmpegReady(true);
+  };
+
+  useEffect(() => {
+    loadFfmpeg();
+  }, []);
 
   const formatTime = (timeInSeconds: number) => {
     const minutes = Math.floor(timeInSeconds / 60);
@@ -116,6 +132,79 @@ function AudioRecorder() {
     }
   };
 
+  const splitAndUpload = async (file: File) => {
+    if (!ffmpegReady) return;
+
+    // Read the file
+    ffmpeg.FS("writeFile", "input.wav", await fetchFile(file));
+
+    // Convert to MP3
+    await ffmpeg.run(
+      "-i",
+      "input.wav",
+      "-codec:a",
+      "libmp3lame",
+      "-qscale:a",
+      "2",
+      "input.mp3"
+    );
+
+    // Split the MP3
+    await ffmpeg.run(
+      "-i",
+      "input.mp3",
+      "-f",
+      "segment",
+      "-segment_time",
+      "180",
+      "-c",
+      "copy",
+      "out%03d.mp3"
+    );
+
+    // Iterate over the chunks and upload each
+    const chunkFiles = ffmpeg
+      .FS("readdir", "/")
+      .filter((file) => file.startsWith("out"));
+    let transcription = "";
+
+    for (let file of chunkFiles) {
+      // Read the chunk
+      const data = ffmpeg.FS("readFile", file);
+      const blob = new Blob([data.buffer], { type: "audio/mp3" });
+      const chunkFile = new File([blob], file, { type: "audio/mp3" });
+
+      // Send chunk to Whisper API
+      const formData = new FormData();
+      formData.append("file", chunkFile);
+
+      const response = await fetch("/api/transform/whisper", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to upload chunk");
+      }
+
+      const result = await response.json();
+      transcription += result.transcription;
+    }
+
+    // Send combined transcription to ChatGPT API
+    console.log(transcription)
+    const chatResponse = await fetch("/api/transform/gpt", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ transcription }),
+    });
+
+    const chatData = await chatResponse.json();
+    localStorage.setItem("markdownContent", chatData.summary);
+    localStorage.setItem("newNoteId", chatData.id);
+    router.push(`/dashboard/notes/${chatData.id}/edit`);
+  };
+
   const uploadFile = async () => {
     if (!audioFile) {
       console.error("Audio file missing!");
@@ -124,29 +213,13 @@ function AudioRecorder() {
 
     setIsLoading(true); // Set loading true when upload starts
 
-    const formData = new FormData();
-    formData.append("file", audioFile);
-
-    fetch("/api/transform", {
-      method: "POST",
-      body: formData,
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-        return response.json();
-      })
-      .then((data) => {
-        localStorage.setItem("markdownContent", data.summary);
-        localStorage.setItem("newNoteId", data.id);
-        setIsLoading(false); // Update loading state
-        router.push(`/dashboard/notes/${data.id}/edit`);
-      })
-      .catch((error) => {
-        console.error("There was a problem with the fetch operation:", error);
-        setIsLoading(false); // Update loading state
-      });
+    try {
+      await splitAndUpload(audioFile);
+      setIsLoading(false); // Update loading state
+    } catch (error) {
+      console.error("There was a problem with the upload operation:", error);
+      setIsLoading(false); // Update loading state
+    }
   };
 
   const recordingColor = useColorModeValue("#e74c3c", "#ff0000");
