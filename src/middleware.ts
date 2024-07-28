@@ -28,10 +28,10 @@ export async function middleware(req: NextRequest) {
         }
     } else {
         // No token found, redirect to login
-        if (pathname === '/') {
-            return NextResponse.next();
-        } else {
-            return NextResponse.redirect(new URL('/login', req.url));
-        }
+        // if (pathname === '/') {
+        //     return NextResponse.next();
+        // } else {
+        return NextResponse.redirect(new URL('/login', req.url));
+        // }
     }
 }
