@@ -35,7 +35,7 @@
     <a href="https://lecturize.vercel.app"><strong>Explore Lecturize »</strong></a>
     <br />
     <br />
-    <a href="https://lecturize.vercel.app">View Live</a>
+    <a href="https://lecturizepw.netlify.app">View Live</a>
     ·
     <a href="https://github.com/ski3r3n/lecturizefinal/issues/new?labels=bug&template=bug-report---.md">Report Bug</a>
     ·
@@ -76,7 +76,7 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-[![Product Name Screen Shot][product-screenshot]](https://lecturize.vercel.app)
+[![Product Name Screen Shot][product-screenshot]](https://lecturizepw.netlify.app)
 
 Lecturize is a platform that converts verbal teaching into concise, summarized revision notes using AI.
 
@@ -95,7 +95,7 @@ Lecturize is a platform that converts verbal teaching into concise, summarized r
 
 ## Getting Started
 
-You are strongly recommended to use the deployed version of Lecturize at [https://lecturize.vercel.app](https://lecturize.vercel.app)
+You are strongly recommended to use the deployed version of Lecturize at [https://lecturizepw.netlify.app](https://lecturizepw.netlfiy.app). An alternative is [https://lecturize.vercel.app](https://lecturize.vercel.app)
 
 However, if you wish to run it locally, you can follow the steps below.
 
