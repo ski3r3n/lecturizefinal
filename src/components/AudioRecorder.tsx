@@ -19,7 +19,8 @@ import { createFFmpeg, fetchFile } from "@ffmpeg/ffmpeg";
 
 let ffmpeg = createFFmpeg({
   log: true,
-  corePath: "https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.11.0/dist/ffmpeg-core.js",
+  corePath:
+    "https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.11.0/dist/ffmpeg-core.js",
 });
 
 async function initFFmpeg() {
@@ -29,7 +30,9 @@ async function initFFmpeg() {
 }
 
 function AudioRecorder() {
-  const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
+  const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(
+    null
+  );
   const [recording, setRecording] = useState(false);
   const [audioChunks, setAudioChunks] = useState<Blob[]>([]);
   const [paused, setPaused] = useState(false);
@@ -45,7 +48,23 @@ function AudioRecorder() {
 
   const saveButtonRef = useRef<HTMLButtonElement | null>(null);
   const router = useRouter();
-
+  useEffect(() => {
+    return () => {
+      // Cleanup function to reset states
+      setMediaRecorder(null)
+      setRecording(false);
+      setPaused(false);
+      setAudioChunks([]);
+      setAudioURL(null);
+      setAudioFile(null);
+      setTimer(0);
+      setIsLoading(false);
+      setError(null);
+      setProgress("");
+      setTotalTime(0);
+      setCancelProcessing(false);
+    };
+  }, []);
   useEffect(() => {
     let interval: NodeJS.Timeout | null = null;
     if (recording && !paused) {
@@ -72,15 +91,23 @@ function AudioRecorder() {
   const formatTime = (timeInSeconds: number) => {
     const minutes = Math.floor(timeInSeconds / 60);
     const seconds = timeInSeconds % 60;
-    return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+    return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(
+      2,
+      "0"
+    )}`;
   };
 
   const startRecording = async () => {
     try {
+      // Stop previous media recorder if still running
+      if (mediaRecorder && mediaRecorder.state !== "inactive") {
+        mediaRecorder.stop();
+      }
+
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       const recorder = new MediaRecorder(stream);
       setMediaRecorder(recorder);
-      setAudioChunks([]);
+      setAudioChunks([]); // Reset audio chunks for a new recording
       setTimer(0);
 
       const localChunks: Blob[] = [];
@@ -113,7 +140,9 @@ function AudioRecorder() {
       setPaused(false);
     } catch (error) {
       console.error("Error accessing microphone:", error);
-      setError("Error accessing microphone. Please check your device settings.");
+      setError(
+        "Error accessing microphone. Please check your device settings."
+      );
     }
   };
 
@@ -157,7 +186,9 @@ function AudioRecorder() {
       const seconds = parseInt(match[3], 10);
       const currentTime = hours * 3600 + minutes * 60 + seconds;
       setProgress(
-        `Converting to MP3: ${formatTime(currentTime)} / ${formatTime(totalTime)}`
+        `Converting to MP3: ${formatTime(currentTime)} / ${formatTime(
+          totalTime
+        )}`
       );
     }
   };
@@ -248,7 +279,9 @@ function AudioRecorder() {
         }
       }
 
-      setProgress("All chunks uploaded. Sending combined transcription to ChatGPT...");
+      setProgress(
+        "All chunks uploaded. Sending combined transcription to ChatGPT..."
+      );
 
       const chatResponse = await fetch("/api/transform/gpt", {
         method: "POST",
@@ -324,7 +357,9 @@ function AudioRecorder() {
     // Clear the file system
     // ffmpeg.FS("unlink", "input.wav");
     ffmpeg.FS("unlink", "input.mp3");
-    const chunkFiles = ffmpeg.FS("readdir", "/").filter((file) => file.startsWith("out"));
+    const chunkFiles = ffmpeg
+      .FS("readdir", "/")
+      .filter((file) => file.startsWith("out"));
     chunkFiles.forEach((file) => ffmpeg.FS("unlink", file));
 
     console.log("ffmpeg ready after cancel");
@@ -401,8 +436,7 @@ function AudioRecorder() {
             <audio
               controls
               style={{ width: "100%", marginTop: "20px" }}
-              src={audioURL!}
-            >
+              src={audioURL!}>
               Your browser does not support the audio element.
             </audio>
 
@@ -413,8 +447,7 @@ function AudioRecorder() {
                 size="md"
                 borderRadius="md"
                 fontWeight="bold"
-                mt="4"
-              >
+                mt="4">
                 Save Recording
               </Button>
             )}
