@@ -129,7 +129,7 @@ To run Lecturize locally, you will need these software installed:
 
 ### Using Lecturize (Website)
 
-Visit [https://lecturize.vercel.app/](https://lecturize.vercel.app/) to use the platform online.
+Visit [https://lecturizepw.netlify.app/](https://lecturizepw.netlify.app/) to use the platform online.
 
 ### Running the Program Locally
 
