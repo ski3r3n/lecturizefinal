@@ -32,7 +32,7 @@
   <p align="center">
     An awesome way to revise class contents
     <br />
-    <a href="https://lecturize.vercel.app"><strong>Explore Lecturize »</strong></a>
+    <a href="https://lecturizepw.netlify.app"><strong>Explore Lecturize »</strong></a>
     <br />
     <br />
     <a href="https://lecturizepw.netlify.app">View Live</a>
