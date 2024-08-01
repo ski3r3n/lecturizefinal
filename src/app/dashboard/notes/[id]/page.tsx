@@ -29,7 +29,9 @@ import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import Link from "next/link";
 import markdownToPDF from "@/app/utils/MarkdownToPDF";
-
+import remarkMath from "remark-math";
+import rehypeKatex from "rehype-katex";
+import "katex/dist/katex.min.css";
 import "./styles.css";
 
 interface Note {
@@ -172,7 +174,8 @@ const NoteViewer = ({ params }: { params: { id: string } }) => {
         </HStack>
         <Divider />
         <Text fontSize="lg" color={"gray.800"} className="markdown-body">
-          <Markdown remarkPlugins={[remarkGfm]}>{note.content}</Markdown>
+          <Markdown remarkPlugins={[remarkGfm, remarkMath]}
+    rehypePlugins={[rehypeKatex]}>{note.content}</Markdown>
         </Text>
         <HStack justify="left" mt={4}>
           <Avatar name={note.author?.name || "Anonymous"} />

@@ -25,6 +25,9 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import { useRouter } from "next/navigation";
+import remarkMath from "remark-math";
+import rehypeKatex from "rehype-katex";
+import "katex/dist/katex.min.css";
 
 // Dynamically import the markdown editor
 const MdEditor = dynamic(() => import("react-markdown-editor-lite"), {
@@ -264,8 +267,7 @@ const MarkdownEditorPage = ({ params }: { params: { id: string } }) => {
                 id="subject"
                 placeholder="Select subject"
                 value={selectedSubject}
-                onChange={(e) => setSelectedSubject(e.target.value)}
-              >
+                onChange={(e) => setSelectedSubject(e.target.value)}>
                 {subjects.map((subject) => (
                   <option key={subject.id} value={subject.id}>
                     {subject.name}
@@ -279,8 +281,7 @@ const MarkdownEditorPage = ({ params }: { params: { id: string } }) => {
                 id="class"
                 placeholder={"Select class"}
                 value={selectedClass}
-                onChange={(e) => setSelectedClass(e.target.value)}
-              >
+                onChange={(e) => setSelectedClass(e.target.value)}>
                 {classes.map((cls) => (
                   <option key={cls.id} value={cls.id}>
                     {cls.name}
@@ -301,7 +302,13 @@ const MarkdownEditorPage = ({ params }: { params: { id: string } }) => {
           <Box mt={6} border="1px" borderColor="gray.200" bg="white">
             <MdEditor
               style={{ height: "500px" }}
-              renderHTML={(text) => <Markdown>{text}</Markdown>}
+              renderHTML={(text) => (
+                <Markdown
+                  remarkPlugins={[remarkMath]}
+                  rehypePlugins={[rehypeKatex]}>
+                  {text}
+                </Markdown>
+              )}
               onChange={handleEditorChange}
               value={noteContent}
             />
@@ -316,8 +323,7 @@ const MarkdownEditorPage = ({ params }: { params: { id: string } }) => {
           <AlertDialog
             isOpen={isOpen}
             leastDestructiveRef={cancelRef}
-            onClose={onClose}
-          >
+            onClose={onClose}>
             <AlertDialogOverlay>
               <AlertDialogContent>
                 <AlertDialogHeader fontSize="lg" fontWeight="bold">

@@ -36,7 +36,7 @@ export const POST = async (req: NextRequest) => {
       messages: [
         {
           role: "user",
-          content: `Summarize this lecture into concise, bullet-pointed markdown notes suitable for high school revision, make it easy to skim through, remember, and revise, addressing the typical needs of a high school student preparing for exams or assessments. Do not add any additional information, only the main points of the lecture, brief explanations and definitions are acceptable, but do not make up content. The following is the lecture transcription:
+          content: `If rendering math is needed, you should only use the double dollar sign rendering, for example $$ \\\\frac{d}{dx}(\\\\cos x) = -\\sin x $$. Never leave a line after the first $$ and before the last $$.\nSummarize this lecture into concise, bullet-pointed markdown notes suitable for high school revision, make it easy to skim through, remember, and revise, addressing the typical needs of a high school student preparing for exams or assessments. Do not add any additional information, only the main points of the lecture, brief explanations and definitions are acceptable, but do not make up content. The following is the lecture transcription:
           ${transcription}`,
         },
       ],
