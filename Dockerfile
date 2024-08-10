@@ -4,6 +4,9 @@ FROM node:18-alpine
 # Install dependencies required for PhantomJS
 RUN apk add --no-cache bzip2 curl
 
+# Set the OPENSSL_CONF environment variable to /dev/null
+ENV OPENSSL_CONF=/dev/null
+
 # Set the working directory in the container
 WORKDIR /app
 
