@@ -7,6 +7,8 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
+const PROMPT = "Using the transcription provided below, generate concise, bullet-pointed markdown notes suitable for high school revision. Ensure the notes are structured to aid easy skimming, memorization, and review. Focus on distilling the main points, essential concepts, and pertinent examples relevant to the topics discussed in the lecture. Provide brief definitions and explanations only as necessary, directly tied to the lecture content without introducing extraneous information. If mathematical expressions are required, use LaTeX formatting enclosed within double dollar signs `$$` without additional spacing at the beginning or end. For instance: `$$\frac{d}{dx}(\cos x) = -\sin x$$`. Here is the lecture transcription:"
+
 async function getHighestNoteId() {
   const highestNote = await prisma.note.findFirst({
     orderBy: {
@@ -36,8 +38,7 @@ export const POST = async (req: NextRequest) => {
       messages: [
         {
           role: "user",
-          content: `If rendering math is needed, you should only use the double dollar sign rendering, for example $$ \\\\frac{d}{dx}(\\\\cos x) = -\\sin x $$. Never leave a line after the first $$ and before the last $$.\nSummarize this lecture into concise, bullet-pointed markdown notes suitable for high school revision, make it easy to skim through, remember, and revise, addressing the typical needs of a high school student preparing for exams or assessments. Do not add any additional information, only the main points of the lecture, brief explanations and definitions are acceptable, but do not make up content. The following is the lecture transcription:
-          ${transcription}`,
+          content: `${PROMPT}${transcription}`,
         },
       ],
       model: "gpt-4o-mini",

@@ -1,10 +1,13 @@
 import { NextResponse } from "next/server";
 import { NextRequest } from "next/server";
-import { OpenAI } from "openai";
+// import { OpenAI } from "openai";
+import Groq from "groq-sdk";
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+
+// const openai = new OpenAI({
+//   apiKey: process.env.OPENAI_API_KEY,
+// });
 
 export const POST = async (req: NextRequest) => {
   const formData = await req.formData();
@@ -17,9 +20,14 @@ export const POST = async (req: NextRequest) => {
   try {
     console.log("Whispering");
     // Transcribe using OpenAI Whisper API
-    const whisperResponse = await openai.audio.transcriptions.create({
+    // const whisperResponse = await openai.audio.transcriptions.create({
+    //   file: file,
+    //   model: "whisper-1",
+    // });
+
+    const whisperResponse = await groq.audio.transcriptions.create({
       file: file,
-      model: "whisper-1",
+      model: "whisper-large-v3",
     });
 
     const transcription = whisperResponse.text;

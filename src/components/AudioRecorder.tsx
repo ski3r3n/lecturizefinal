@@ -51,7 +51,7 @@ function AudioRecorder() {
   useEffect(() => {
     return () => {
       // Cleanup function to reset states
-      setMediaRecorder(null)
+      setMediaRecorder(null);
       setRecording(false);
       setPaused(false);
       setAudioChunks([]);
@@ -221,15 +221,24 @@ function AudioRecorder() {
 
       setProgress("Conversion to MP3 completed. Splitting the MP3...");
 
+      // await ffmpeg.run(
+      //   "-i",
+      //   "input.mp3",
+      //   "-f",
+      //   "segment",
+      //   "-segment_time",
+      //   "180",
+      //   "-c",
+      //   "copy",
+      //   "out%03d.mp3"
+      // );
       await ffmpeg.run(
-        "-i",
-        "input.mp3",
-        "-f",
-        "segment",
-        "-segment_time",
-        "180",
-        "-c",
-        "copy",
+        "-i", "input.wav",
+        "-codec:a", "libmp3lame",
+        "-qscale:a", "5",
+        "-f", "segment",
+        "-segment_time", "180",
+        "-c", "copy",
         "out%03d.mp3"
       );
 
@@ -436,7 +445,8 @@ function AudioRecorder() {
             <audio
               controls
               style={{ width: "100%", marginTop: "20px" }}
-              src={audioURL!}>
+              src={audioURL!}
+            >
               Your browser does not support the audio element.
             </audio>
 
@@ -447,7 +457,8 @@ function AudioRecorder() {
                 size="md"
                 borderRadius="md"
                 fontWeight="bold"
-                mt="4">
+                mt="4"
+              >
                 Save Recording
               </Button>
             )}
