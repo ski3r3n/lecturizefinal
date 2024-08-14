@@ -198,40 +198,17 @@ function AudioRecorder() {
       console.error("ffmpeg is not ready");
       return;
     }
-
+  
     setProgress("Preparing to process the file...");
-
+  
     try {
       ffmpeg.FS("writeFile", "input.wav", await fetchFile(file));
-      setProgress("File loaded successfully. Converting to MP3...");
-
+      setProgress("Processing your audio...");
+  
       ffmpeg.setLogger(({ message }) => {
         parseFfmpegLog(message);
       });
-
-      await ffmpeg.run(
-        "-i",
-        "input.wav",
-        "-codec:a",
-        "libmp3lame",
-        "-qscale:a",
-        "2",
-        "input.mp3"
-      );
-
-      setProgress("Conversion to MP3 completed. Splitting the MP3...");
-
-      // await ffmpeg.run(
-      //   "-i",
-      //   "input.mp3",
-      //   "-f",
-      //   "segment",
-      //   "-segment_time",
-      //   "180",
-      //   "-c",
-      //   "copy",
-      //   "out%03d.mp3"
-      // );
+  
       await ffmpeg.run(
         "-i", "input.wav",
         "-codec:a", "libmp3lame",
@@ -241,43 +218,43 @@ function AudioRecorder() {
         "-c", "copy",
         "out%03d.mp3"
       );
-
-      setProgress("Splitting completed. Uploading chunks...");
-
+  
+      setProgress("Audio Processed!");
+  
       const chunkFiles = ffmpeg
         .FS("readdir", "/")
         .filter((file) => file.startsWith("out"));
-      let transcription = "";
-
-      for (let i = 0; i < chunkFiles.length; i++) {
+  
+      // Parallel upload
+      const uploadPromises = chunkFiles.map(async (file, i) => {
         if (cancelProcessing) {
           setProgress("Processing canceled.");
           setIsLoading(false);
           return;
         }
-
-        const file = chunkFiles[i];
-        setProgress(`Uploading chunk ${i + 1} of ${chunkFiles.length}...`);
-
+  
+        // setProgress(`Uploading chunk ${i + 1} of ${chunkFiles.length}...`);
+        setProgress(`Transcribing Your Lecture`);
+  
         const data = ffmpeg.FS("readFile", file);
         const blob = new Blob([data.buffer], { type: "audio/mp3" });
         const chunkFile = new File([blob], file, { type: "audio/mp3" });
-
+  
         const formData = new FormData();
         formData.append("file", chunkFile);
-
+  
         try {
           const response = await fetch("/api/transform/whisper", {
             method: "POST",
             body: formData,
           });
-
+  
           if (!response.ok) {
             throw new Error("Failed to upload chunk");
           }
-
+  
           const result = await response.json();
-          transcription += result.transcription;
+          return result.transcription;
         } catch (error) {
           console.error("Error during chunk upload:", error);
           if (cancelProcessing) {
@@ -285,19 +262,21 @@ function AudioRecorder() {
             setIsLoading(false);
             return;
           }
+          return ""; // Return empty string for failed uploads to avoid breaking the chain
         }
-      }
-
-      setProgress(
-        "All chunks uploaded. Sending combined transcription to ChatGPT..."
-      );
-
+      });
+  
+      const transcriptions = await Promise.all(uploadPromises);
+      const transcription = transcriptions.join(" ");
+  
+      setProgress("Performing the magic...");
+  
       const chatResponse = await fetch("/api/transform/gpt", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ transcription }),
       });
-
+  
       const chatData = await chatResponse.json();
       localStorage.setItem("markdownContent", chatData.summary);
       localStorage.setItem("newNoteId", chatData.id);
@@ -321,6 +300,7 @@ function AudioRecorder() {
       setIsLoading(false);
     }
   };
+  
 
   const uploadFile = async () => {
     if (!audioFile) {
