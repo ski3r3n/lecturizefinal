@@ -202,7 +202,17 @@ function AudioRecorder() {
     setProgress("Preparing to process the file...");
   
     try {
-      ffmpeg.FS("writeFile", "input.wav", await fetchFile(file));
+      const inputFile = "input.mp3";
+      if (file.type === "video/mp4") {
+        // Convert MP4 to MP3
+        ffmpeg.FS("writeFile", "input.mp4", await fetchFile(file));
+        setProgress("Converting MP4 to MP3...");
+        await ffmpeg.run("-i", "input.mp4", "-q:a", "0", "-map", "a", inputFile);
+      } else {
+        // For audio files
+        ffmpeg.FS("writeFile", inputFile, await fetchFile(file));
+      }
+  
       setProgress("Processing your audio...");
   
       ffmpeg.setLogger(({ message }) => {
@@ -210,7 +220,7 @@ function AudioRecorder() {
       });
   
       await ffmpeg.run(
-        "-i", "input.wav",
+        "-i", inputFile,
         "-codec:a", "libmp3lame",
         "-qscale:a", "5",
         "-f", "segment",
@@ -233,7 +243,6 @@ function AudioRecorder() {
           return;
         }
   
-        // setProgress(`Uploading chunk ${i + 1} of ${chunkFiles.length}...`);
         setProgress(`Transcribing Your Lecture`);
   
         const data = ffmpeg.FS("readFile", file);
@@ -300,6 +309,8 @@ function AudioRecorder() {
       setIsLoading(false);
     }
   };
+  
+  
   
 
   const uploadFile = async () => {
@@ -380,7 +391,7 @@ function AudioRecorder() {
           <>
             <FormControl>
               <FormLabel>Upload an Audio File</FormLabel>
-              <Input type="file" accept="audio/*" onChange={handleFileChange} />
+              <Input type="file" accept="audio/*,video/mp4" onChange={handleFileChange} />
             </FormControl>
 
             <Box display="flex" alignItems="center" justifyContent="center">
