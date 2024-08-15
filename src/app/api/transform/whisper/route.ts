@@ -1,17 +1,20 @@
 import { NextResponse } from "next/server";
 import { NextRequest } from "next/server";
-// import { OpenAI } from "openai";
 import Groq from "groq-sdk";
-
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
-
-// const openai = new OpenAI({
-//   apiKey: process.env.OPENAI_API_KEY,
-// });
 
 export const POST = async (req: NextRequest) => {
   const formData = await req.formData();
   const file = formData.get("file") as File;
+  const keyChoice = req.headers.get("x-groq-key") || "GROQ_API_KEY"; // or use a query param like req.nextUrl.searchParams.get('key')
+
+  const apiKey =
+    keyChoice === "GROQ_API_KEY_2"
+      ? process.env.GROQ_API_KEY_2
+      : process.env.GROQ_API_KEY;
+  
+  console.log(apiKey)
+
+  const groq = new Groq({ apiKey });
 
   if (!file) {
     return NextResponse.json({ error: "No files received." }, { status: 400 });
@@ -19,11 +22,6 @@ export const POST = async (req: NextRequest) => {
 
   try {
     console.log("Whispering");
-    // Transcribe using OpenAI Whisper API
-    // const whisperResponse = await openai.audio.transcriptions.create({
-    //   file: file,
-    //   model: "whisper-1",
-    // });
 
     const whisperResponse = await groq.audio.transcriptions.create({
       file: file,

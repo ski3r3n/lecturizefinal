@@ -253,7 +253,12 @@ function AudioRecorder() {
         formData.append("file", chunkFile);
   
         try {
+          const groqKeyOption = localStorage.getItem('groq_key_option') || '1';
+          console.log("KEY OPTION", groqKeyOption);
           const response = await fetch("/api/transform/whisper", {
+            headers: {
+              'x-groq-key-option': groqKeyOption,
+            },
             method: "POST",
             body: formData,
           });
