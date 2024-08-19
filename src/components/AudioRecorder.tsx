@@ -128,7 +128,7 @@ function AudioRecorder() {
           type: "audio/wav",
         });
         setAudioFile(audioFile);
-
+        console.log(audioFile.size);
         const audio = new Audio(audioUrl);
         audio.addEventListener("loadedmetadata", () => {
           setTotalTime(Math.floor(audio.duration));
@@ -198,43 +198,84 @@ function AudioRecorder() {
       console.error("ffmpeg is not ready");
       return;
     }
-  
+
     setProgress("Preparing to process the file...");
-  
+
     try {
       const inputFile = "input.mp3";
+      // if (file.type === "audio/wav") {
+      //   // Convert WAV to MP3
+      //   ffmpeg.FS("writeFile", "input.wav", await fetchFile(file));
+      //   setProgress("Converting WAV to MP3...");
+      //   await ffmpeg.run(
+      //     "-i",
+      //     "input.wav",
+      //     "-codec:a",
+      //     "libmp3lame",
+      //     "-qscale:a",
+      //     "2",
+      //     inputFile
+      //   );
+      // }
       if (file.type === "video/mp4") {
         // Convert MP4 to MP3
         ffmpeg.FS("writeFile", "input.mp4", await fetchFile(file));
         setProgress("Converting MP4 to MP3...");
-        await ffmpeg.run("-i", "input.mp4", "-q:a", "0", "-map", "a", inputFile);
+        await ffmpeg.run(
+          "-i",
+          "input.mp4",
+          "-q:a",
+          "0",
+          "-map",
+          "a",
+          inputFile
+        );
+      } else if (file.type === "audio/wav") {
+        // Convert WAV to MP3
+        ffmpeg.FS("writeFile", "input.wav", await fetchFile(file));
+        setProgress("Converting WAV to MP3...");
+        await ffmpeg.run(
+          "-i",
+          "input.wav",
+          "-codec:a",
+          "libmp3lame",
+          "-qscale:a",
+          "2",
+          inputFile
+        );
       } else {
         // For audio files
         ffmpeg.FS("writeFile", inputFile, await fetchFile(file));
       }
-  
+
       setProgress("Processing your audio...");
-  
+
       ffmpeg.setLogger(({ message }) => {
         parseFfmpegLog(message);
       });
-  
+
       await ffmpeg.run(
-        "-i", inputFile,
-        "-codec:a", "libmp3lame",
-        "-qscale:a", "5",
-        "-f", "segment",
-        "-segment_time", "180",
-        "-c", "copy",
+        "-i",
+        inputFile,
+        "-codec:a",
+        "libmp3lame",
+        "-qscale:a",
+        "5",
+        "-f",
+        "segment",
+        "-segment_time",
+        "180",
+        "-c",
+        "copy",
         "out%03d.mp3"
       );
-  
+
       setProgress("Audio Processed!");
-  
+
       const chunkFiles = ffmpeg
         .FS("readdir", "/")
         .filter((file) => file.startsWith("out"));
-  
+
       // Parallel upload
       const uploadPromises = chunkFiles.map(async (file, i) => {
         if (cancelProcessing) {
@@ -242,31 +283,31 @@ function AudioRecorder() {
           setIsLoading(false);
           return;
         }
-  
+
         setProgress(`Transcribing Your Lecture`);
-  
+
         const data = ffmpeg.FS("readFile", file);
         const blob = new Blob([data.buffer], { type: "audio/mp3" });
         const chunkFile = new File([blob], file, { type: "audio/mp3" });
-  
+
         const formData = new FormData();
         formData.append("file", chunkFile);
-  
+
         try {
-          const groqKeyOption = localStorage.getItem('groq_key_option') || '1';
+          const groqKeyOption = localStorage.getItem("groq_key_option") || "1";
           console.log("KEY OPTION", groqKeyOption);
           const response = await fetch("/api/transform/whisper", {
             headers: {
-              'x-groq-key-option': groqKeyOption,
+              "x-groq-key-option": groqKeyOption,
             },
             method: "POST",
             body: formData,
           });
-  
+
           if (!response.ok) {
             throw new Error("Failed to upload chunk");
           }
-  
+
           const result = await response.json();
           return result.transcription;
         } catch (error) {
@@ -279,18 +320,18 @@ function AudioRecorder() {
           return ""; // Return empty string for failed uploads to avoid breaking the chain
         }
       });
-  
+
       const transcriptions = await Promise.all(uploadPromises);
       const transcription = transcriptions.join(" ");
-  
+
       setProgress("Performing the magic...");
-  
+
       const chatResponse = await fetch("/api/transform/gpt", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ transcription }),
       });
-  
+
       const chatData = await chatResponse.json();
       localStorage.setItem("markdownContent", chatData.summary);
       localStorage.setItem("newNoteId", chatData.id);
@@ -314,9 +355,6 @@ function AudioRecorder() {
       setIsLoading(false);
     }
   };
-  
-  
-  
 
   const uploadFile = async () => {
     if (!audioFile) {
@@ -396,7 +434,11 @@ function AudioRecorder() {
           <>
             <FormControl>
               <FormLabel>Upload an Audio File</FormLabel>
-              <Input type="file" accept="audio/*,video/mp4" onChange={handleFileChange} />
+              <Input
+                type="file"
+                accept="audio/*,video/mp4"
+                onChange={handleFileChange}
+              />
             </FormControl>
 
             <Box display="flex" alignItems="center" justifyContent="center">
@@ -441,9 +483,9 @@ function AudioRecorder() {
             <audio
               controls
               style={{ width: "100%", marginTop: "20px" }}
-              src={audioURL!}
-            >
-              Your browser does not support the audio element.
+              src={audioURL!}>
+              Your browser does not support the audio element. Please stop using
+              an old version of internet explorer.
             </audio>
 
             {audioURL && (
@@ -453,8 +495,7 @@ function AudioRecorder() {
                 size="md"
                 borderRadius="md"
                 fontWeight="bold"
-                mt="4"
-              >
+                mt="4">
                 Save Recording
               </Button>
             )}
