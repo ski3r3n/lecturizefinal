@@ -193,67 +193,86 @@ function AudioRecorder() {
     }
   };
 
+  // Handle different file formats directly and simplify the FFmpeg logic
   const splitAndUpload = async (file: File) => {
     if (!ffmpegReady) {
       console.error("ffmpeg is not ready");
       return;
     }
-
-    setProgress("Preparing to process the file...");
-
+  
+    setProgress("Processing your audio...");
+  
     try {
-      const inputFile = "input.mp3";
-      // if (file.type === "audio/wav") {
-      //   // Convert WAV to MP3
-      //   ffmpeg.FS("writeFile", "input.wav", await fetchFile(file));
-      //   setProgress("Converting WAV to MP3...");
-      //   await ffmpeg.run(
-      //     "-i",
-      //     "input.wav",
-      //     "-codec:a",
-      //     "libmp3lame",
-      //     "-qscale:a",
-      //     "2",
-      //     inputFile
-      //   );
-      // }
-      if (file.type === "video/mp4") {
-        // Convert MP4 to MP3
-        ffmpeg.FS("writeFile", "input.mp4", await fetchFile(file));
-        setProgress("Converting MP4 to MP3...");
-        await ffmpeg.run(
-          "-i",
-          "input.mp4",
-          "-q:a",
-          "0",
-          "-map",
-          "a",
-          inputFile
-        );
-      } else if (file.type === "audio/wav") {
-        // Convert WAV to MP3
-        ffmpeg.FS("writeFile", "input.wav", await fetchFile(file));
+      let inputFile = "";
+      const extension = file.name.split('.').pop();
+  
+      if (file.type === "audio/mpeg" || file.type === "audio/mp3" || extension === "mpg" || extension === "mpeg") {
+        // Directly use the mp3 or MPEG file without re-encoding
+        inputFile = "input.mp3";
+        ffmpeg.FS("writeFile", inputFile, await fetchFile(file));
+      } else if (file.type === "audio/wav" || file.type === "audio/x-wav") {
+        // Convert WAV to MP3 with extreme speed optimizations
+        inputFile = "input.wav";
+        ffmpeg.FS("writeFile", inputFile, await fetchFile(file));
         setProgress("Converting WAV to MP3...");
         await ffmpeg.run(
           "-i",
-          "input.wav",
-          "-codec:a",
+          inputFile,
+          "-c:a",
           "libmp3lame",
-          "-qscale:a",
-          "2",
-          inputFile
+          "-b:a",
+          "96k",  // Lower bitrate for faster processing
+          "-ar",
+          "22050", // Lower sample rate for faster processing
+          "-ac",
+          "1", // Convert to mono
+          "-preset",
+          "ultrafast", // Use ultrafast preset for speed
+          "-threads",
+          "4", // Use multi-threading
+          "output.mp3"
         );
-      } else {
-        // For audio files
+        inputFile = "output.mp3";
+      } else if (file.type === "audio/mp4" || file.type === "audio/m4a" || file.type === "audio/aac") {
+        // Convert AAC or M4A to MP3 with extreme speed optimizations
+        inputFile = "input.aac";
         ffmpeg.FS("writeFile", inputFile, await fetchFile(file));
+        setProgress("Converting AAC/M4A to MP3...");
+        await ffmpeg.run(
+          "-i",
+          inputFile,
+          "-c:a",
+          "libmp3lame",
+          "-b:a",
+          "96k",  // Lower bitrate for faster processing
+          "-ar",
+          "22050", // Lower sample rate for faster processing
+          "-ac",
+          "1", // Convert to mono
+          "-preset",
+          "ultrafast", // Use ultrafast preset for speed
+          "-threads",
+          "4", // Use multi-threading
+          "output.mp3"
+        );
+        inputFile = "output.mp3";
       }
-
-      setProgress("Processing your audio...");
-
-      ffmpeg.setLogger(({ message }) => {
-        parseFfmpegLog(message);
-      });
-
+  
+      // Process the file and upload
+      await processAndUploadChunks(inputFile);
+  
+    } catch (error: any) {
+      console.error("Error during processing:", error);
+      setProgress("An error occurred during processing.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
+  
+  
+  const processAndUploadChunks = async (inputFile) => {
+    try {
       await ffmpeg.run(
         "-i",
         inputFile,
@@ -264,38 +283,31 @@ function AudioRecorder() {
         "-f",
         "segment",
         "-segment_time",
-        "180",
+        "120", // Reduced segment time for more manageable chunks
         "-c",
         "copy",
         "out%03d.mp3"
       );
-
-      setProgress("Audio Processed!");
-
-      const chunkFiles = ffmpeg
-        .FS("readdir", "/")
-        .filter((file) => file.startsWith("out"));
-
-      // Parallel upload
-      const uploadPromises = chunkFiles.map(async (file, i) => {
+  
+      const chunkFiles = ffmpeg.FS("readdir", "/").filter((file) => file.startsWith("out"));
+  
+      // More parallelized chunk processing
+      const uploadPromises = chunkFiles.map(async (file) => {
         if (cancelProcessing) {
           setProgress("Processing canceled.");
           setIsLoading(false);
           return;
         }
-
-        setProgress(`Transcribing Your Lecture`);
-
+  
         const data = ffmpeg.FS("readFile", file);
         const blob = new Blob([data.buffer], { type: "audio/mp3" });
         const chunkFile = new File([blob], file, { type: "audio/mp3" });
-
+  
         const formData = new FormData();
         formData.append("file", chunkFile);
-
+  
         try {
           const groqKeyOption = localStorage.getItem("groq_key_option") || "1";
-          console.log("KEY OPTION", groqKeyOption);
           const response = await fetch("/api/transform/whisper", {
             headers: {
               "x-groq-key-option": groqKeyOption,
@@ -303,11 +315,11 @@ function AudioRecorder() {
             method: "POST",
             body: formData,
           });
-
+  
           if (!response.ok) {
             throw new Error("Failed to upload chunk");
           }
-
+  
           const result = await response.json();
           return result.transcription;
         } catch (error) {
@@ -320,41 +332,28 @@ function AudioRecorder() {
           return ""; // Return empty string for failed uploads to avoid breaking the chain
         }
       });
-
+  
       const transcriptions = await Promise.all(uploadPromises);
       const transcription = transcriptions.join(" ");
-
+  
       setProgress("Performing the magic...");
-
+  
       const chatResponse = await fetch("/api/transform/gpt", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ transcription }),
       });
-
+  
       const chatData = await chatResponse.json();
       localStorage.setItem("markdownContent", chatData.summary);
       localStorage.setItem("newNoteId", chatData.id);
       router.push(`/dashboard/notes/${chatData.id}/edit`);
-    } catch (error: any) {
-      console.error("Error during processing:", error);
-      if (error.message === "ffmpeg has exited") {
-        console.log("The operation was canceled!");
-      } else {
-        console.log("Some other error happened!", error);
-      }
-      if (!cancelProcessing) {
-        setProgress("An error occurred during processing.");
-      }
-    } finally {
-      if (cancelProcessing) {
-        // Ensure ffmpeg is reinitialized properly
-        await initFFmpeg();
-        setFfmpegReady(true);
-      }
-      setIsLoading(false);
+    } catch (error) {
+      console.error("Error during chunk processing:", error);
     }
   };
+  
+
 
   const uploadFile = async () => {
     if (!audioFile) {
