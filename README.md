@@ -32,10 +32,10 @@
   <p align="center">
     An awesome way to revise class contents
     <br />
-    <a href="https://lecturizepw.netlify.app"><strong>Explore Lecturize »</strong></a>
+    <a href="https://lecturize.ddns.net"><strong>Explore Lecturize »</strong></a>
     <br />
     <br />
-    <a href="https://lecturizepw.netlify.app">View Live</a>
+    <a href="https://lecturize.ddns.net">View Live</a>
     ·
     <a href="https://github.com/ski3r3n/lecturizefinal/issues/new?labels=bug&template=bug-report---.md">Report Bug</a>
     ·
@@ -76,7 +76,7 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-[![Product Name Screen Shot][product-screenshot]](https://lecturizepw.netlify.app)
+[![Product Name Screen Shot][product-screenshot]](https://lecturize.ddns.net)
 
 Lecturize is a platform that converts verbal teaching into concise, summarized revision notes using AI.
 
@@ -95,7 +95,7 @@ Lecturize is a platform that converts verbal teaching into concise, summarized r
 
 ## Getting Started
 
-You are strongly recommended to use the deployed version of Lecturize at [https://lecturizepw.netlify.app](https://lecturizepw.netlfiy.app). An alternative is [https://lecturize.vercel.app](https://lecturize.vercel.app)
+You are strongly recommended to use the deployed version of Lecturize at [https://lecturize.ddns.net](https://lecturizepw.netlfiy.app). An alternative is [https://lecturize.vercel.app](https://lecturize.vercel.app)
 
 However, if you wish to run it locally, you can follow the steps below.
 
@@ -129,7 +129,7 @@ To run Lecturize locally, you will need these software installed:
 
 ### Using Lecturize (Website)
 
-Visit [https://lecturizepw.netlify.app/](https://lecturizepw.netlify.app/) to use the platform online.
+Visit [https://lecturize.ddns.net/](https://lecturize.ddns.net/) to use the platform online.
 
 ### Running the Program Locally
 
